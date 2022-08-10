@@ -1,8 +1,6 @@
 <?php
 
-namespace VendorName\Skeleton\Database\Factories;
-
-use Illuminate\Database\Eloquent\Factories\Factory;
+namespace Visanduma\LaravelInventory\Database\Factories;
 
 /*
 class ModelFactory extends Factory
