@@ -124,6 +124,8 @@ return new class extends Migration
     {
         $prefix = config('inventory.table_name_prefix') . "_";
 
+        Schema::disableForeignKeyConstraints();
+
         Schema::dropIfExists($prefix . 'products');
         Schema::dropIfExists($prefix . 'product_categories');
         Schema::dropIfExists($prefix . 'product_sku');
