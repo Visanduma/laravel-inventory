@@ -8,7 +8,10 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create(config('inventory.table_name_prefix') . '_products', function (Blueprint $table) {
+        $prefix = config('inventory.table_name_prefix') . "_";
+
+
+        Schema::create($prefix . 'products', function (Blueprint $table) use ($prefix) {
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
@@ -19,12 +22,12 @@ return new class extends Migration
 
             $table->foreign('parent_id')
                 ->references('id')
-                ->on(config('inventory.table_name_prefix') . '_products')
+                ->on($prefix . 'products')
                 ->cascadeOnDelete();
         });
 
 
-        Schema::create(config('inventory.table_name_prefix') . '_product_categories', function (Blueprint $table) {
+        Schema::create($prefix . 'product_categories', function (Blueprint $table) use ($prefix) {
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
@@ -33,13 +36,13 @@ return new class extends Migration
 
             $table->foreign('parent_id')
                 ->references('id')
-                ->on(config('inventory.table_name_prefix') . '_product_categories')
+                ->on($prefix . 'product_categories')
                 ->restrictOnDelete();
 
         });
 
 
-        Schema::create(config('inventory.table_name_prefix') . '_product_sku', function (Blueprint $table) {
+        Schema::create($prefix . 'product_sku', function (Blueprint $table) use ($prefix) {
             $table->id();
             $table->string('code')->unique();
             $table->integer('product_id');
@@ -47,18 +50,18 @@ return new class extends Migration
 
             $table->foreign('product_id')
                 ->references('id')
-                ->on(config('inventory.table_name_prefix') . '_products')
+                ->on($prefix . 'products')
                 ->cascadeOnDelete();
         });
 
-        Schema::create(config('inventory.table_name_prefix') . '_metrics', function (Blueprint $table) {
+        Schema::create($prefix . 'metrics', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('symbol');
             $table->timestamps();
         });
 
-        Schema::create(config('inventory.table_name_prefix') . '_stock', function (Blueprint $table) {
+        Schema::create($prefix . 'stocks', function (Blueprint $table) use ($prefix) {
             $table->id();
             $table->integer('product_id');
             $table->double('qty');
@@ -68,12 +71,12 @@ return new class extends Migration
 
             $table->foreign('product_id')
                 ->references('id')
-                ->on(config('inventory.table_name_prefix') . '_products')
+                ->on($prefix . 'products')
                 ->cascadeOnDelete();
         });
 
 
-        Schema::create(config('inventory.table_name_prefix') . '_stock_movements', function (Blueprint $table) {
+        Schema::create($prefix . 'stock_movements', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
             $table->double('before')->default(0);
@@ -85,7 +88,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create(config('inventory.table_name_prefix') . '_suppliers', function (Blueprint $table) {
+        Schema::create($prefix . 'suppliers', function (Blueprint $table) use ($prefix) {
             $table->id();
             $table->string('name');
             $table->integer('address_id');
@@ -97,12 +100,12 @@ return new class extends Migration
 
             $table->foreign('address_id')
                 ->references('id')
-                ->on(config('inventory.table_name_prefix') . '_address')
+                ->on($prefix . 'address')
                 ->cascadeOnDelete();
         });
 
 
-        Schema::create(config('inventory.table_name_prefix') . '_address', function (Blueprint $table) {
+        Schema::create($prefix . 'address', function (Blueprint $table) {
             $table->id();
             $table->string('building')->nullable();
             $table->string('street')->nullable();
@@ -112,5 +115,23 @@ return new class extends Migration
             $table->string('country')->nullable();
             $table->timestamps();
         });
+
+
     }
+
+
+    public function down()
+    {
+        $prefix = config('inventory.table_name_prefix') . "_";
+
+        Schema::dropIfExists($prefix . 'products');
+        Schema::dropIfExists($prefix . 'product_categories');
+        Schema::dropIfExists($prefix . 'product_sku');
+        Schema::dropIfExists($prefix . 'metrics');
+        Schema::dropIfExists($prefix . 'stocks');
+        Schema::dropIfExists($prefix . 'stock_movements');
+        Schema::dropIfExists($prefix . 'suppliers');
+        Schema::dropIfExists($prefix . 'address');
+    }
+
 };
