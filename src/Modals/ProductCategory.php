@@ -12,5 +12,12 @@ class ProductCategory extends Model
 
     use TableConfigs;
 
-    protected $table = "product_categories";
+    protected $tableName = "product_categories";
+    protected $guarded = [];
+
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'category_id');
+    }
 }

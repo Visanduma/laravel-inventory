@@ -12,5 +12,12 @@ class ProductSku extends Model
 
     use TableConfigs;
 
-    protected $table = "product_sku";
+    protected $tableName = "product_sku";
+    protected $guarded = [];
+
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 }

@@ -11,5 +11,12 @@ class Metric extends Model
 {
     use TableConfigs;
 
-    protected $table = "metrics";
+    protected $tableName = "metrics";
+    protected $guarded = [];
+
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'metric_id');
+    }
 }

@@ -8,6 +8,6 @@ trait TableConfigs
 {
     public function getTable(): string
     {
-        return config('inventory.table_name_prefix') . "_" . $this->table;
+        return config('inventory.table_name_prefix') . "_" . $this->tableName;
     }
 }
