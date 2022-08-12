@@ -81,4 +81,28 @@ class Product extends Model
         })->first();
     }
 
+    public function setCategory($category)
+    {
+        if (!$category instanceof ProductCategory) {
+            $category = ProductCategory::find($category);
+        }
+
+        $this->category()->associate($category);
+    }
+
+    public function setMetric($metric)
+    {
+        if (!$metric instanceof Metric) {
+            $metric = Metric::find($metric);
+        }
+
+        $this->metric()->associate($metric);
+    }
+
+
+    public function getSku()
+    {
+        return $this->sku->code ?? null;
+    }
+
 }

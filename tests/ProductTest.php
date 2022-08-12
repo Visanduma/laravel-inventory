@@ -46,6 +46,8 @@ class ProductTest extends TestCase
         ]);
 
         $p->category()->associate($c);
+        $p->setCategory($c);
+
 
         $this->assertEquals('Cat one', $p->category->name);
     }
@@ -60,6 +62,7 @@ class ProductTest extends TestCase
         ]);
 
         $p->metric()->associate($m);
+        $p->setMetric($m);
 
         $this->assertEquals('Kg', $p->metric->symbol);
 
@@ -99,7 +102,7 @@ class ProductTest extends TestCase
 
         $p->assignSku();
 
-        $this->assertEquals($p->generateSku(), $p->sku->code);
+        $this->assertEquals($p->generateSku(), $p->getSku());
 
     }
 
