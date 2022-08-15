@@ -21,12 +21,10 @@ class ProductTest extends TestCase
         $this->assertCount(1, Product::all());
     }
 
-    private function createProduct(array $data = [])
+    private function createProduct(array $data = ['name' => 'product one']): Product
     {
 
-
         $data = array_merge($data, [
-            'name' => 'product one',
             'description' => 'some description',
             'category_id' => 1,
             'metric_id' => 1
@@ -92,6 +90,8 @@ class ProductTest extends TestCase
 
         //check variant parent
         $this->assertEquals($p->id, $v->parent->id);
+        // todo check variant test again
+        $this->assertTrue($p->hasVariant('Variant'));
 
     }
 

@@ -12,6 +12,21 @@ class StockMovement extends Model
 
     use TableConfigs;
 
-    protected $table = "stock_movements";
+    protected $tableName = "stock_movements";
+    protected $guarded = [];
+
+//    protected static function boot()
+//    {
+//        parent::boot();
+//
+//        static::created(function($model){
+//            $model->user_id = 5;
+//        });
+//    }
+
+    public function stock()
+    {
+        return $this->belongsTo(Stock::class, 'stock_id');
+    }
 
 }

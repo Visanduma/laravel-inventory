@@ -6,6 +6,7 @@ namespace Visanduma\LaravelInventory\Modals;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Visanduma\LaravelInventory\Exceptions\BatchNotFoundException;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
 
 class Product extends Model
@@ -49,6 +50,11 @@ class Product extends Model
         return $this->hasOne(ProductSku::class, 'product_id');
     }
 
+    public function stocks()
+    {
+        return $this->hasMany(Stock::class, 'product_id');
+    }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -57,7 +63,7 @@ class Product extends Model
     |
     */
 
-    public function generateSku()
+    public function generateSku(): string
     {
         $p1 = Str::substr(strtoupper($this->name), 0, 3);
         $p2 = Str::substr(strtoupper($this->category->name), 0, 2);
@@ -99,10 +105,58 @@ class Product extends Model
         $this->metric()->associate($metric);
     }
 
-
     public function getSku()
     {
         return $this->sku->code ?? null;
+    }
+
+    public function inStock($batch = 'default'): bool
+    {
+        return $this->stock($batch)->qty > 0 ?? fasle;
+    }
+
+    public function inAnyStock(): bool
+    {
+        return $this->stocks()->sum('qty') > 0;
+    }
+
+    public function stock($batch = 'default'): Stock
+    {
+        if ($this->stocks()->where('batch', $batch)->exists()) {
+            return $this->stocks()->where('batch', $batch)->first();
+        } else {
+            throw new BatchNotFoundException();
+        }
+    }
+
+    public function createStock($batch = 'default', $price = 0, $cost = 0): Stock
+    {
+        return $this->stocks()->create([
+            'batch' => $batch,
+            'qty' => 0,
+            'price' => $price,
+            'cost' => $cost
+        ]);
+    }
+
+    public function hasStock($qty, $batch = 'default'): bool
+    {
+        return $this->stock($batch)->qty >= $qty;
+    }
+
+    public function add($qty, $reason = null, $batch = 'default')
+    {
+        return $this->stock($batch)->add($qty, $reason);
+    }
+
+    public function take($qty, $reason = null, $batch = 'default')
+    {
+        return $this->stock($batch)->take($qty, $reason);
+    }
+
+    public function hasVariant($name): bool
+    {
+        return $this->variants()->where('name', $name)->exists();
     }
 
 }

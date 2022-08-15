@@ -15,6 +15,11 @@ class TestCase extends Orchestra
         Factory::guessFactoryNamesUsing(
             fn(string $modelName) => 'Visanduma\\LaravelInventory\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
+
+        $this->actingAs(new TestUser([
+            'name' => 'Test user',
+            'id' => 1
+        ]));
     }
 
     protected function getPackageProviders($app)

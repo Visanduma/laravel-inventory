@@ -64,6 +64,7 @@ return new class extends Migration
         Schema::create($prefix . 'stocks', function (Blueprint $table) use ($prefix) {
             $table->id();
             $table->integer('product_id');
+            $table->string('batch')->nullable();
             $table->double('qty');
             $table->double('cost')->default(0);
             $table->double('price')->default(0);
@@ -78,6 +79,7 @@ return new class extends Migration
 
         Schema::create($prefix . 'stock_movements', function (Blueprint $table) {
             $table->id();
+            $table->integer('stock_id');
             $table->integer('user_id');
             $table->double('before')->default(0);
             $table->double('after')->default(0);

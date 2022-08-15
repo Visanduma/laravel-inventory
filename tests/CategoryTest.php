@@ -19,18 +19,18 @@ class CategoryTest extends TestCase
         $this->assertCount(1, ProductCategory::all());
     }
 
-    private function createCategory(array $data)
+    private function createCategory()
     {
-        return ProductCategory::create($data);
+        return ProductCategory::create([
+            'name' => 'Food',
+        ]);
     }
 
     public function test_createSubCategory()
     {
-        $c = $this->createCategory(['name' => 'parent']);
+        $c = $this->createCategory();
 
-        $cs = $this->createCategory([
-            'name' => 'child'
-        ]);
+        $cs = $this->createCategory();
 
         $c->subCategories()->save($cs);
 
