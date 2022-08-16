@@ -5,12 +5,13 @@ namespace Visanduma\LaravelInventory\Modals;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Visanduma\LaravelInventory\Traits\InteractWithStock;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
 
 class Supplier extends Model
 {
 
-    use TableConfigs;
+    use TableConfigs, InteractWithStock;
 
     protected $tableName = "suppliers";
 
@@ -19,7 +20,8 @@ class Supplier extends Model
 
     public function address()
     {
-        return $this->hasOne(Address::class, 'address_id');
+        return $this->hasOne(Address::class, 'id');
     }
+
 
 }

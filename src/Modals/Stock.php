@@ -56,7 +56,7 @@ class Stock extends Model
             'reason' => $reason
         ];
 
-        $this->movements()->create($data);
+       return $this->movements()->create($data);
     }
 
     public function add(int $qty, $reason = null)
@@ -67,12 +67,12 @@ class Stock extends Model
 
         try {
 
-            $this->addMovement($qty, $reason);
+            $mov = $this->addMovement($qty, $reason);
             $this->increment('qty', $qty);
 
             DB::commit();
 
-            return true;
+            return $mov;
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -90,12 +90,12 @@ class Stock extends Model
 
         try {
 
-            $this->addMovement($qty, $reason);
+            $mov = $this->addMovement($qty, $reason);
             $this->decrement('qty', $qty);
 
             DB::commit();
 
-            return true;
+            return $mov;
 
         } catch (\Exception $e) {
             DB::rollBack();

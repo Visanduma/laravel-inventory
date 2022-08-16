@@ -6,6 +6,7 @@ namespace Visanduma\LaravelInventory\Tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Visanduma\LaravelInventory\Modals\Product;
+use Visanduma\LaravelInventory\Modals\Supplier;
 
 class StockTest extends TestCase
 {
@@ -55,7 +56,16 @@ class StockTest extends TestCase
         $prd->stock()->take(5);
         $this->assertEquals(35, $prd->stock()->qty);
 
-        $prd->stock()->take(35);
+        $sup = Supplier::create([
+            'name' => 'Supp one',
+            'address_id' => 1
+        ]);
+
+        $mm = $prd->stock()->take(35);
+        $mm->reference()->associate($sup);
+
+        $this->assertNotNull($mm->reference);
+
         $this->assertFalse($prd->inAnyStock());
         $this->assertFalse($prd->hasStock(10));
 

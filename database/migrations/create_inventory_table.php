@@ -111,10 +111,10 @@ return new class extends Migration
             $table->id();
             $table->string('building')->nullable();
             $table->string('street')->nullable();
-            $table->string('city')->nullable();
+            $table->string('city');
             $table->string('state')->nullable();
             $table->string('zip_code')->nullable();
-            $table->string('country')->nullable();
+            $table->string('country');
             $table->timestamps();
         });
 
