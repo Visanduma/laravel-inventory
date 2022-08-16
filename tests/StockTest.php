@@ -24,7 +24,6 @@ class StockTest extends TestCase
     private function createProduct(array $data = []): Product
     {
 
-
         $data = array_merge($data, [
             'name' => 'product one',
             'description' => 'some description',
@@ -66,6 +65,6 @@ class StockTest extends TestCase
 
         $this->assertEquals(35, $prd->stock()->qty);
 
-
     }
+
 }

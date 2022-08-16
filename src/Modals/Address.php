@@ -11,6 +11,8 @@ class Address extends Model
 {
     use TableConfigs;
 
-    protected $table = "address";
+    protected $tableName = "address";
+
+    protected $guarded = [];
 
 }

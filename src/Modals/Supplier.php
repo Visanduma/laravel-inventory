@@ -12,6 +12,14 @@ class Supplier extends Model
 
     use TableConfigs;
 
-    protected $table = "suppliers";
+    protected $tableName = "suppliers";
+
+    protected $guarded = [];
+
+
+    public function address()
+    {
+        return $this->hasOne(Address::class, 'address_id');
+    }
 
 }

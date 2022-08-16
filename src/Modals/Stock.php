@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Visanduma\LaravelInventory\Modals;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Visanduma\LaravelInventory\Exceptions\QuantityTypeException;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
 
 class Stock extends Model
@@ -44,7 +47,7 @@ class Stock extends Model
     */
 
 
-    public function addMovement($qty, $reason = null)
+    public function addMovement(int $qty, $reason = null)
     {
         $data = [
             'before' => $this->qty,
@@ -56,18 +59,50 @@ class Stock extends Model
         $this->movements()->create($data);
     }
 
-    public function add($qty, $reason = null)
+    public function add(int $qty, $reason = null)
     {
-        $this->addMovement($qty, $reason);
+        throw_if(!is_numeric($qty), QuantityTypeException::class);
 
-        $this->increment('qty', $qty);
+        DB::beginTransaction();
+
+        try {
+
+            $this->addMovement($qty, $reason);
+            $this->increment('qty', $qty);
+
+            DB::commit();
+
+            return true;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return $e;
+        }
+
     }
 
-    public function take($qty, $reason = null)
+    public function take(int $qty, $reason = null)
     {
-        $this->addMovement($qty, $reason);
+        throw_if(!is_numeric($qty), QuantityTypeException::class);
 
-        $this->decrement('qty', $qty);
+        DB::beginTransaction();
+
+        try {
+
+            $this->addMovement($qty, $reason);
+            $this->decrement('qty', $qty);
+
+            DB::commit();
+
+            return true;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return $e;
+        }
     }
+
 
 }
