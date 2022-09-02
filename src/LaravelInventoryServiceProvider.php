@@ -18,8 +18,6 @@ class LaravelInventoryServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-inventory')
             ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_laravel-inventory_table')
-            ->hasCommand(LaravelInventoryCommand::class);
+            ->hasMigration('create_laravel_inventory_tables');
     }
 }

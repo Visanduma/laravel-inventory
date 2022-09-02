@@ -20,14 +20,14 @@ composer require visanduma/laravel-inventory
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-inventory-migrations"
+php artisan vendor:publish --tag="inventory-migrations"
 php artisan migrate
 ```
 
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-inventory-config"
+php artisan vendor:publish --tag="inventory-config"
 ```
 
 This is the contents of the published config file:

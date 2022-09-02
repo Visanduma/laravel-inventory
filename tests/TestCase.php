@@ -34,7 +34,7 @@ class TestCase extends Orchestra
         config()->set('database.default', 'testing');
 
 
-        $migration = include __DIR__ . '/../database/migrations/create_inventory_table.php';
+        $migration = include __DIR__ . '/../database/migrations/create_laravel_inventory_tables.php';
         $migration->up();
 
     }
