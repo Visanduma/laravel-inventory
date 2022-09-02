@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->integer('category_id');
             $table->integer('metric_id');
-            $table->integer('parent_id')->nullable();
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
 
             $table->foreign('parent_id')
@@ -31,7 +31,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
-            $table->integer('parent_id')->nullable();
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
 
             $table->foreign('parent_id')
@@ -45,7 +45,7 @@ return new class extends Migration
         Schema::create($prefix . 'product_sku', function (Blueprint $table) use ($prefix) {
             $table->id();
             $table->string('code')->unique();
-            $table->integer('product_id');
+            $table->unsignedBigInteger('product_id');
             $table->timestamps();
 
             $table->foreign('product_id')
@@ -63,7 +63,7 @@ return new class extends Migration
 
         Schema::create($prefix . 'stocks', function (Blueprint $table) use ($prefix) {
             $table->id();
-            $table->integer('product_id');
+            $table->unsignedBigInteger('product_id');
             $table->string('batch')->nullable();
             $table->double('qty');
             $table->double('cost')->default(0);
@@ -89,24 +89,7 @@ return new class extends Migration
             $table->nullableMorphs('reference');
             $table->timestamps();
         });
-
-        Schema::create($prefix . 'suppliers', function (Blueprint $table) use ($prefix) {
-            $table->id();
-            $table->string('name');
-            $table->integer('address_id');
-            $table->string('contact_title')->nullable();
-            $table->string('contact_name')->nullable();
-            $table->string('contact_phone')->nullable();
-            $table->string('contact_email')->nullable();
-            $table->timestamps();
-
-            $table->foreign('address_id')
-                ->references('id')
-                ->on($prefix . 'address')
-                ->cascadeOnDelete();
-        });
-
-
+        
         Schema::create($prefix . 'address', function (Blueprint $table) {
             $table->id();
             $table->string('building')->nullable();
@@ -118,7 +101,21 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        Schema::create($prefix . 'suppliers', function (Blueprint $table) use ($prefix) {
+            $table->id();
+            $table->string('name');
+            $table->unsignedBigInteger('address_id');
+            $table->string('contact_title')->nullable();
+            $table->string('contact_name')->nullable();
+            $table->string('contact_phone')->nullable();
+            $table->string('contact_email')->nullable();
+            $table->timestamps();
 
+            $table->foreign('address_id')
+                ->references('id')
+                ->on($prefix . 'address')
+                ->cascadeOnDelete();
+        });
     }
 
 
