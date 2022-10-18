@@ -112,7 +112,7 @@ class Product extends Model
 
     public function inStock($batch = 'default'): bool
     {
-        return $this->stock($batch)->qty > 0 ?? fasle;
+        return $this->stock($batch)->qty > 0 ?? false;
     }
 
     public function inAnyStock(): bool
