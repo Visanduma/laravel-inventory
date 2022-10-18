@@ -60,35 +60,7 @@ return new class extends Migration
             $table->string('symbol');
             $table->timestamps();
         });
-
-        Schema::create($prefix . 'stocks', function (Blueprint $table) use ($prefix) {
-            $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->string('batch')->nullable();
-            $table->double('qty');
-            $table->double('cost')->default(0);
-            $table->double('price')->default(0);
-            $table->timestamps();
-
-            $table->foreign('product_id')
-                ->references('id')
-                ->on($prefix . 'products')
-                ->cascadeOnDelete();
-        });
-
-
-        Schema::create($prefix . 'stock_movements', function (Blueprint $table) {
-            $table->id();
-            $table->integer('stock_id');
-            $table->integer('user_id');
-            $table->double('before')->default(0);
-            $table->double('after')->default(0);
-            $table->double('qty')->default(0);
-            $table->double('price')->default(0);
-            $table->string('reason')->nullable();
-            $table->nullableMorphs('reference');
-            $table->timestamps();
-        });
+        
         
         Schema::create($prefix . 'address', function (Blueprint $table) {
             $table->id();
@@ -116,6 +88,44 @@ return new class extends Migration
                 ->on($prefix . 'address')
                 ->cascadeOnDelete();
         });
+
+        Schema::create($prefix . 'stocks', function (Blueprint $table) use ($prefix) {
+            $table->id();
+            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('supplier_id');
+            $table->string('batch')->nullable();
+            $table->double('qty');
+            $table->double('cost')->default(0);
+            $table->double('price')->default(0);
+            $table->timestamps();
+
+            $table->foreign('product_id')
+                ->references('id')
+                ->on($prefix . 'products')
+                ->cascadeOnDelete();
+            
+            $table->foreign('supplier_id')
+                ->references('id')
+                ->on($prefix . 'suppliers')
+                ->cascadeOnDelete();
+            
+        });
+
+
+        Schema::create($prefix . 'stock_movements', function (Blueprint $table) {
+            $table->id();
+            $table->integer('stock_id');
+            $table->integer('user_id');
+            $table->double('before')->default(0);
+            $table->double('after')->default(0);
+            $table->double('qty')->default(0);
+            $table->double('price')->default(0);
+            $table->string('reason')->nullable();
+            $table->nullableMorphs('reference');
+            $table->timestamps();
+        });
+        
+        
     }
 
 
