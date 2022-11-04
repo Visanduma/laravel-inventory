@@ -42,17 +42,22 @@ class Product extends Model
 
     public function parent()
     {
-        return $this->belongsTo(self::class, 'parent_id');
+        return $this->belongsTo(self::class);
     }
 
     public function sku()
     {
-        return $this->hasOne(ProductSku::class, 'product_id');
+        return $this->hasOne(ProductSku::class);
     }
 
     public function stocks()
     {
-        return $this->hasMany(Stock::class, 'product_id');
+        return $this->hasMany(Stock::class);
+    }
+
+    public function attributes()
+    {
+        return $this->hasMany(Attribute::class);
     }
 
 
@@ -158,5 +163,32 @@ class Product extends Model
     {
         return $this->variants()->where('name', $name)->exists();
     }
+
+    public function addAttribute($name,$value)
+    {
+        $this->addAttributes([
+            $name => $value
+        ]);
+    }
+    // create multiple attributes a once
+    public function addAttributes(array $attributes)
+    {
+        $attributes = array_map(function($k,$v){
+            return [
+                'name' => $k,
+                'value' => $v
+            ];
+        },array_keys($attributes) , array_values($attributes));
+
+        $this->attributes()->createMany($attributes);
+
+    }
+
+    public function removeAttribute($name)
+    {
+        $this->attributes()->where('name',$name)->first()->delete();
+    }
+
+
 
 }

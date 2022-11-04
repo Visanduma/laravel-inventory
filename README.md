@@ -7,7 +7,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/visanduma/laravel-inventory/Fix%20PHP%20code%20style%20issues?label=code%20style)](https://github.com/visanduma/laravel-inventory/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/visanduma/laravel-inventory.svg?style=flat-square)](https://packagist.org/packages/visanduma/laravel-inventory)
 
-Simple & reliable inventory managment package for Laravel
+Simple & reliable inventory management package for Laravel
 
 ## Installation
 
@@ -61,7 +61,8 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [LaHiRu](https://github.com/Visanduma)
+- [Visanduma](https://github.com/Visanduma)
+- [LaHiRu](https://github.com/lahirulhr)
 - [All Contributors](../../contributors)
 
 ## License

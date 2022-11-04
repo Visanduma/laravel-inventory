@@ -89,7 +89,7 @@ return new class extends Migration
             $table->nullableMorphs('reference');
             $table->timestamps();
         });
-        
+
         Schema::create($prefix . 'address', function (Blueprint $table) {
             $table->id();
             $table->string('building')->nullable();
@@ -116,6 +116,19 @@ return new class extends Migration
                 ->on($prefix . 'address')
                 ->cascadeOnDelete();
         });
+
+
+        Schema::create($prefix . 'attributes', function(Blueprint $table) use ($prefix){
+            $table->id();
+            $table->unsignedBigInteger('product_id');
+            $table->string('name');
+            $table->string('value');
+
+            $table->foreign('product_id')
+            ->references('id')
+            ->on($prefix.'products')
+            ->cascadeOnDelete();
+        });
     }
 
 
@@ -133,6 +146,7 @@ return new class extends Migration
         Schema::dropIfExists($prefix . 'stock_movements');
         Schema::dropIfExists($prefix . 'suppliers');
         Schema::dropIfExists($prefix . 'address');
+        Schema::dropIfExists($prefix . 'attributes');
     }
 
 };

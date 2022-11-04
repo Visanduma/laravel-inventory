@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Visanduma\LaravelInventory\Tests;
-
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Visanduma\LaravelInventory\Modals\Metric;
@@ -23,7 +21,6 @@ class ProductTest extends TestCase
 
     private function createProduct(array $data = ['name' => 'product one']): Product
     {
-
         $data = array_merge($data, [
             'description' => 'some description',
             'category_id' => 1,
@@ -63,7 +60,6 @@ class ProductTest extends TestCase
         $p->setMetric($m);
 
         $this->assertEquals('Kg', $p->metric->symbol);
-
     }
 
     public function test_createProductVariant()
@@ -92,7 +88,6 @@ class ProductTest extends TestCase
         $this->assertEquals($p->id, $v->parent->id);
         // todo check variant test again
         $this->assertTrue($p->hasVariant('Variant'));
-
     }
 
     public function test_createSkuCodeForProduct()
@@ -103,7 +98,6 @@ class ProductTest extends TestCase
         $p->assignSku();
 
         $this->assertEquals($p->generateSku(), $p->getSku());
-
     }
 
     private function createProductCategory()
@@ -123,4 +117,34 @@ class ProductTest extends TestCase
 
         $this->assertEquals($p->id, Product::findBySku($p->generateSku())->id);
     }
+
+    public function test_createAttributesForProduct()
+    {
+        $p = $this->createProduct();
+
+        $p->addAttribute('Brand','Xiaomi');
+
+        // create multiple attr
+        $p->addAttributes([
+            'brand' => 'redmi',
+            'color' => 'silver'
+        ]);
+
+        $this->assertCount(3, $p->attributes);
+    }
+
+
+    public function test_removeAttributeFromProduct()
+    {
+        $p = $this->createProduct();
+        $p->addAttributes([
+                    'brand' => 'redmi',
+                    'color' => 'silver'
+                ]);
+
+        $p->removeAttribute('brand');
+
+        $this->assertCount(1,$p->attributes);
+    }
+
 }
