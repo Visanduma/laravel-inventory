@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Visanduma\LaravelInventory\Exceptions\QuantityTypeException;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
+use Visanduma\LaravelInventory\Modals\Supplier;
 
 class Stock extends Model
 {
@@ -36,6 +37,11 @@ class Stock extends Model
     public function movements()
     {
         return $this->hasMany(StockMovement::class, 'stock_id');
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class,'supplier_id');    
     }
 
 

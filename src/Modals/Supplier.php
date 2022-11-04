@@ -7,6 +7,8 @@ namespace Visanduma\LaravelInventory\Modals;
 use Illuminate\Database\Eloquent\Model;
 use Visanduma\LaravelInventory\Traits\InteractWithStock;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
+use Visanduma\LaravelInventory\Modals\Stock;
+
 
 class Supplier extends Model
 {
@@ -21,6 +23,11 @@ class Supplier extends Model
     public function address()
     {
         return $this->hasOne(Address::class, 'id');
+    }
+
+    public function stocks()
+    {
+        return $this->hasMany(Stock::class);
     }
 
 
