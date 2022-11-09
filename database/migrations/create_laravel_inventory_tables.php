@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     public function up()
     {
         $prefix = config('inventory.table_name_prefix') . "_";
@@ -17,13 +16,13 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->integer('category_id');
             $table->integer('metric_id');
-            $table->unsignedBigInteger('parent_id')->nullable();
+            // $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
 
-            $table->foreign('parent_id')
-                ->references('id')
-                ->on($prefix . 'products')
-                ->cascadeOnDelete();
+            // $table->foreign('parent_id')
+            //     ->references('id')
+            //     ->on($prefix . 'products')
+            //     ->cascadeOnDelete();
         });
 
 
@@ -38,19 +37,18 @@ return new class extends Migration
                 ->references('id')
                 ->on($prefix . 'product_categories')
                 ->restrictOnDelete();
-
         });
 
 
         Schema::create($prefix . 'product_sku', function (Blueprint $table) use ($prefix) {
             $table->id();
             $table->string('code')->unique();
-            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('product_variant_id');
             $table->timestamps();
 
-            $table->foreign('product_id')
+            $table->foreign('product_variant_id')
                 ->references('id')
-                ->on($prefix . 'products')
+                ->on($prefix . 'product_variants')
                 ->cascadeOnDelete();
         });
 
@@ -63,16 +61,16 @@ return new class extends Migration
 
         Schema::create($prefix . 'stocks', function (Blueprint $table) use ($prefix) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('product_variant_id');
             $table->string('batch')->nullable();
             $table->double('qty');
             $table->double('cost')->default(0);
             $table->double('price')->default(0);
             $table->timestamps();
 
-            $table->foreign('product_id')
+            $table->foreign('product_variant_id')
                 ->references('id')
-                ->on($prefix . 'products')
+                ->on($prefix . 'product_variants')
                 ->cascadeOnDelete();
         });
 
@@ -118,7 +116,7 @@ return new class extends Migration
         });
 
 
-        Schema::create($prefix . 'attributes', function(Blueprint $table) use ($prefix){
+        Schema::create($prefix . 'attributes', function (Blueprint $table) use ($prefix) {
             $table->id();
             $table->unsignedBigInteger('product_id');
             $table->string('name');
@@ -129,6 +127,41 @@ return new class extends Migration
             ->on($prefix.'products')
             ->cascadeOnDelete();
         });
+
+        Schema::create($prefix . 'product_variants', function (Blueprint $table) use ($prefix) {
+            $table->id();
+            $table->unsignedBigInteger('product_id');
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->timestamps();
+
+            $table->foreign('product_id')
+            ->references('id')
+            ->on($prefix.'products')
+            ->cascadeOnDelete();
+        });
+
+        Schema::create($prefix . 'variants', function (Blueprint $table) use ($prefix) {
+            $table->id();
+            $table->unsignedBigInteger('product_id');
+            $table->string('name');
+
+            $table->foreign('product_id')
+                        ->references('id')
+                        ->on($prefix.'products')
+                        ->cascadeOnDelete();
+        });
+
+        Schema::create($prefix . 'variant_values', function (Blueprint $table) use ($prefix) {
+                $table->unsignedBigInteger('variant_id');
+                $table->string('value');
+
+                $table->foreign('variant_id')
+                        ->references('id')
+                        ->on($prefix.'variants')
+                        ->cascadeOnDelete();
+        });
+
     }
 
 
@@ -147,6 +180,8 @@ return new class extends Migration
         Schema::dropIfExists($prefix . 'suppliers');
         Schema::dropIfExists($prefix . 'address');
         Schema::dropIfExists($prefix . 'attributes');
+        Schema::dropIfExists($prefix . 'product_variants');
+        Schema::dropIfExists($prefix . 'variants');
+        Schema::dropIfExists($prefix . 'variant_values');
     }
-
 };

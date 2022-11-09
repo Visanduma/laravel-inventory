@@ -66,38 +66,20 @@ class ProductTest extends TestCase
     {
         $p = $this->createProduct();
 
-        $v = $this->createProduct([
-            'name' => 'Variant'
-        ]);
-
-        $v2 = $this->createProduct([
-            'name' => 'More Variant'
-        ]);
-
-        $p->variants()->save($v);
-        $p->refresh();
+        $p->createVariant('red-m');
 
         $this->assertEquals(1, $p->variants->count());
-
-        $p->variants()->save($v2);
-        $p->refresh();
-
-        $this->assertEquals(2, $p->variants->count());
-
-        //check variant parent
-        $this->assertEquals($p->id, $v->parent->id);
-        // todo check variant test again
-        $this->assertTrue($p->hasVariant('Variant'));
     }
 
-    public function test_createSkuCodeForProduct()
+    public function test_createSkuCodeForProductVariant()
     {
         $p = $this->createProduct();
-        $p->category()->associate($this->createProductCategory());
 
-        $p->assignSku();
+        $v = $p->createVariant('red-m');
 
-        $this->assertEquals($p->generateSku(), $p->getSku());
+        $v->assignSku('vb555');
+
+        $this->assertEquals('vb555', $v->getSku());
     }
 
     private function createProductCategory()
@@ -111,18 +93,19 @@ class ProductTest extends TestCase
     public function test_findProductBySku()
     {
         $p = $this->createProduct();
-        $p->category()->associate($this->createProductCategory());
+        $v = $p->createVariant('red-m');
+        $v->assignSku('RM222');
 
-        $p->assignSku();
+        $result = Product::findBySku('RM222');
 
-        $this->assertEquals($p->id, Product::findBySku($p->generateSku())->id);
+        $this->assertEquals($p->id, $result->id);
     }
 
     public function test_createAttributesForProduct()
     {
         $p = $this->createProduct();
 
-        $p->addAttribute('Brand','Xiaomi');
+        $p->addAttribute('Brand', 'Xiaomi');
 
         // create multiple attr
         $p->addAttributes([
@@ -144,7 +127,23 @@ class ProductTest extends TestCase
 
         $p->removeAttribute('brand');
 
-        $this->assertCount(1,$p->attributes);
+        $this->assertCount(1, $p->attributes);
     }
 
+    public function test_helperMethods()
+    {
+        $p = $this->createProduct();
+
+        $v = $p->createVariant('red-m');
+        $v->createStock();
+        $v->stock()->add(100);
+
+        $v->createStock('new');
+        $v->stock('new')->add(250);
+
+        $this->assertEquals(350, $p->currentStock());
+
+        $this->assertTrue($p->hasVariant('red-m'));
+        $this->assertFalse($p->hasVariant('blue-m'));
+    }
 }

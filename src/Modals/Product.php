@@ -37,22 +37,7 @@ class Product extends Model
 
     public function variants()
     {
-        return $this->hasMany(self::class, 'parent_id');
-    }
-
-    public function parent()
-    {
-        return $this->belongsTo(self::class);
-    }
-
-    public function sku()
-    {
-        return $this->hasOne(ProductSku::class);
-    }
-
-    public function stocks()
-    {
-        return $this->hasMany(Stock::class);
+        return $this->hasMany(ProductVariant::class);
     }
 
     public function attributes()
@@ -77,19 +62,19 @@ class Product extends Model
         return "$p1-$p2$p3";
     }
 
-    public function assignSku($code = null)
-    {
-
-        $this->sku()->firstOrCreate([
-            'code' => $code ?: $this->generateSku()
-        ]);
-    }
-
     public static function findBySku($sku)
     {
-        return self::whereHas('sku', function ($q) use ($sku) {
+        return ProductVariant::whereHas('sku', function ($q) use ($sku) {
             $q->where('code', $sku);
         })->first();
+    }
+
+    public function createVariant($name,$description = null)
+    {
+       return  $this->variants()->create([
+            'name' => $name,
+            'description' => $description
+        ]);
     }
 
     public function setCategory($category)
@@ -108,55 +93,6 @@ class Product extends Model
         }
 
         $this->metric()->associate($metric);
-    }
-
-    public function getSku()
-    {
-        return $this->sku->code ?? null;
-    }
-
-    public function inStock($batch = 'default'): bool
-    {
-        return $this->stock($batch)->qty > 0 ?? false;
-    }
-
-    public function inAnyStock(): bool
-    {
-        return $this->stocks()->sum('qty') > 0;
-    }
-
-    public function stock($batch = 'default'): Stock
-    {
-        if ($this->stocks()->where('batch', $batch)->exists()) {
-            return $this->stocks()->where('batch', $batch)->first();
-        } else {
-            throw new BatchNotFoundException();
-        }
-    }
-
-    public function createStock($batch = 'default', $price = 0, $cost = 0): Stock
-    {
-        return $this->stocks()->create([
-            'batch' => $batch,
-            'qty' => 0,
-            'price' => $price,
-            'cost' => $cost
-        ]);
-    }
-
-    public function hasStock($qty, $batch = 'default'): bool
-    {
-        return $this->stock($batch)->qty >= $qty;
-    }
-
-    public function add($qty, $reason = null, $batch = 'default')
-    {
-        return $this->stock($batch)->add($qty, $reason);
-    }
-
-    public function take($qty, $reason = null, $batch = 'default')
-    {
-        return $this->stock($batch)->take($qty, $reason);
     }
 
     public function hasVariant($name): bool
@@ -189,6 +125,15 @@ class Product extends Model
         $this->attributes()->where('name',$name)->first()->delete();
     }
 
+    public function currentStock()
+    {
+        return $this->variants()->withSum('stocks','qty')->get()->sum('stocks_sum_qty') ?? 0;
+    }
+
+    public function addStock($variant,$qty, $batch = 'default')
+    {
+
+    }
 
 
 }

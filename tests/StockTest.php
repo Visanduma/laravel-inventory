@@ -12,13 +12,14 @@ class StockTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_createStockForProduct()
+    public function test_createStockForProductVariant()
     {
         $prd = $this->createProduct();
+        $v = $prd->createVariant('default');
 
-        $prd->createStock(); // default batch
+        $v->createStock(); // default batch
 
-        $this->assertCount(1, $prd->stocks);
+        $this->assertCount(1, $v->stocks);
 
     }
 
@@ -40,40 +41,23 @@ class StockTest extends TestCase
     {
         $prd = $this->createProduct();
 
-        $prd->createStock(); // default batch
+        $v = $prd->createVariant('default');
 
-        $prd->stock()->add(40);
+        $v->createStock(); // default batch
 
-        $this->assertTrue($prd->inStock());
-        $this->assertTrue($prd->inAnyStock());
+        $v->stock()->add(40);
+        $v->add(5); // short method
 
+        $this->assertEquals(45, $v->stock()->qty);
 
-//        $this->expectException(BatchNotFoundException::class);
-//        $prd->inStock('non exist batch');
+        $this->assertTrue($v->inStock());
+        $this->assertFalse($v->hasStock(50));
+        $this->assertTrue($v->hasStock(35));
+        $this->assertTrue($v->inAnyStock());
 
-        $this->assertEquals(40, $prd->stock()->qty);
-
-        $prd->stock()->take(5);
-        $this->assertEquals(35, $prd->stock()->qty);
-
-        $sup = Supplier::create([
-            'name' => 'Supp one',
-            'address_id' => 1
-        ]);
-
-        $mm = $prd->stock()->take(35);
-        $mm->reference()->associate($sup);
-
-        $this->assertNotNull($mm->reference);
-
-        $this->assertFalse($prd->inAnyStock());
-        $this->assertFalse($prd->hasStock(10));
-
-        $prd->add(40);
-        $prd->take(5);
-        $this->assertTrue($prd->hasStock(30));
-
-        $this->assertEquals(35, $prd->stock()->qty);
+        $v->stock()->take(5);
+        $v->take(5); // short method
+        $this->assertEquals(35, $v->stock()->qty);
 
     }
 
