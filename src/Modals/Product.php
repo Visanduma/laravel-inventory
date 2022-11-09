@@ -6,7 +6,6 @@ namespace Visanduma\LaravelInventory\Modals;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Visanduma\LaravelInventory\Exceptions\BatchNotFoundException;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
 
 class Product extends Model
@@ -128,11 +127,6 @@ class Product extends Model
     public function currentStock()
     {
         return $this->variants()->withSum('stocks','qty')->get()->sum('stocks_sum_qty') ?? 0;
-    }
-
-    public function addStock($variant,$qty, $batch = 'default')
-    {
-
     }
 
 
