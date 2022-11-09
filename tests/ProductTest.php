@@ -146,4 +146,17 @@ class ProductTest extends TestCase
         $this->assertTrue($p->hasVariant('red-m'));
         $this->assertFalse($p->hasVariant('blue-m'));
     }
+
+    public function test_createOptionsAndValues()
+    {
+        $p = $this->createProduct();
+        $o = $p->createOption('color');
+        $this->assertCount(1, $p->options);
+
+        $o->addValue('green');
+        $o->addValues(['blue','red']);
+
+        $this->assertCount(3, $o->values);
+    }
+
 }

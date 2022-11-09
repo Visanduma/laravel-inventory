@@ -44,6 +44,11 @@ class Product extends Model
         return $this->hasMany(Attribute::class);
     }
 
+    public function options()
+    {
+        return $this->hasMany(ProductOption::class);
+    }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -127,6 +132,13 @@ class Product extends Model
     public function currentStock()
     {
         return $this->variants()->withSum('stocks','qty')->get()->sum('stocks_sum_qty') ?? 0;
+    }
+
+    public function createOption($name)
+    {
+        return $this->options()->create([
+            'name' => $name
+        ]);
     }
 
 
