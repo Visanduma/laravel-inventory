@@ -6,6 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Visanduma\LaravelInventory\Modals\Metric;
 use Visanduma\LaravelInventory\Modals\Product;
 use Visanduma\LaravelInventory\Modals\ProductCategory;
+use Visanduma\LaravelInventory\Modals\Supplier;
+use Visanduma\LaravelInventory\Modals\Address;
 
 class ProductTest extends TestCase
 {
@@ -80,6 +82,12 @@ class ProductTest extends TestCase
         $v->assignSku('vb555');
 
         $this->assertEquals('vb555', $v->getSku());
+
+        $v->assignSku('bb666');
+
+        $v->refresh();
+
+        $this->assertEquals('bb666', $v->getSku());
     }
 
     private function createProductCategory()
@@ -135,10 +143,10 @@ class ProductTest extends TestCase
         $p = $this->createProduct();
 
         $v = $p->createVariant('red-m');
-        $v->createStock();
+        $v->createStock('default', $this->createSupplier());
         $v->stock()->add(100);
 
-        $v->createStock('new');
+        $v->createStock('new', $this->createSupplier());
         $v->stock('new')->add(250);
 
         $this->assertEquals(350, $p->currentStock());
@@ -157,6 +165,19 @@ class ProductTest extends TestCase
         $o->addValues(['blue','red']);
 
         $this->assertCount(3, $o->values);
+    }
+
+      private function createSupplier()
+    {
+        $adr = Address::create([
+                   'city' => 'Anuradhapura',
+                   'country' => 'LK'
+               ]);
+
+        return Supplier::create([
+            'name' => 'Supp one',
+            'address_id' => $adr
+        ]);
     }
 
 }
