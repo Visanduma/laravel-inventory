@@ -88,4 +88,13 @@ class ProductVariant extends Model
     {
         return $this->stock()->sum('qty');
     }
+    
+    public function baseProduct()
+    {
+        return $this->belongsTo(Product::class);
+    }
+    public function getFullName()
+    {
+        return $this->baseProduct->name . " | " . $this->name;
+    }
 }

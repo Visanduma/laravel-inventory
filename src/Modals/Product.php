@@ -103,6 +103,11 @@ class Product extends Model
     {
         return $this->variants()->where('name', $name)->exists();
     }
+    
+    public function hasVariants():bool
+    {
+        return $this->variants()->count() > 0 ;
+    }
 
     public function addAttribute($name,$value)
     {
