@@ -66,6 +66,7 @@ return new class () extends Migration {
             $table->double('qty');
             $table->double('cost')->default(0);
             $table->double('price')->default(0);
+            $table->unsignedBigInteger('supplier_id');
             $table->timestamps();
 
             $table->foreign('product_variant_id')

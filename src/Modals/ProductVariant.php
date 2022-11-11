@@ -26,11 +26,12 @@ class ProductVariant extends Model
 
     // methods
 
-    public function assignSku($code = null)
+    public function assignSku($code)
     {
-        $this->sku()->firstOrCreate([
+        $this->sku()->updateOrCreate(['product_variant_id' => $this->id],[
             'code' => $code
         ]);
+
     }
 
      public function getSku()
@@ -38,13 +39,14 @@ class ProductVariant extends Model
          return $this->sku->code ?? null;
      }
 
-    public function createStock($batch = 'default', $price = 0, $cost = 0): Stock
+    public function createStock($batch = 'default', Supplier $supplier): Stock
     {
         return $this->stocks()->create([
             'batch' => $batch,
             'qty' => 0,
-            'price' => $price,
-            'cost' => $cost
+            'price' => 0,
+            'cost' => 0,
+            'supplier_id' => $supplier->id
         ]);
     }
 
@@ -80,5 +82,10 @@ class ProductVariant extends Model
     public function take($qty, $reason = null, $batch = 'default')
     {
         return $this->stock($batch)->take($qty, $reason);
+    }
+
+    public function totalInStock()
+    {
+        return $this->stock()->sum('qty');
     }
 }
