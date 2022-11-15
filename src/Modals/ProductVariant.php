@@ -2,7 +2,6 @@
 
 namespace Visanduma\LaravelInventory\Modals;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Visanduma\LaravelInventory\Exceptions\BatchNotFoundException;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
@@ -14,6 +13,14 @@ class ProductVariant extends Model
     protected $tableName = "product_variants";
 
     protected $guarded = [];
+
+    public static function boot()
+    {
+        parent::boot();
+        static::updating(function($item){
+            $item->name = self::sortName($item->name);
+        });
+    }
 
     public function sku()
     {
@@ -88,7 +95,7 @@ class ProductVariant extends Model
     {
         return $this->stock()->sum('qty');
     }
-    
+
     public function baseProduct()
     {
         return $this->belongsTo(Product::class);
@@ -96,5 +103,13 @@ class ProductVariant extends Model
     public function getFullName()
     {
         return $this->baseProduct->name . " | " . $this->name;
+    }
+
+     private static function sortName($name)
+    {
+        $name = explode("-", $name);
+        sort($name);
+
+        return implode("-", $name);
     }
 }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Visanduma\LaravelInventory\Modals;
-
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -10,7 +8,6 @@ use Visanduma\LaravelInventory\Traits\TableConfigs;
 
 class Product extends Model
 {
-
     use TableConfigs;
 
     protected $tableName = "products";
@@ -73,12 +70,17 @@ class Product extends Model
         })->first();
     }
 
-    public function createVariant($name,$description = null)
+    public function findVariantByName($name)
     {
-       return  $this->variants()->create([
-            'name' => $name,
-            'description' => $description
-        ]);
+        return $this->variants()->where('name', $this->sortName($name))->first();
+    }
+
+    public function createVariant($name, $description = null)
+    {
+        return  $this->variants()->create([
+             'name' => $this->sortName($name),
+             'description' => $description
+         ]);
     }
 
     public function setCategory($category)
@@ -101,15 +103,15 @@ class Product extends Model
 
     public function hasVariant($name): bool
     {
-        return $this->variants()->where('name', $name)->exists();
+        return $this->variants()->where('name', $this->sortName($name))->exists();
     }
-    
-    public function hasVariants():bool
+
+    public function hasVariants(): bool
     {
         return $this->variants()->count() > 0 ;
     }
 
-    public function addAttribute($name,$value)
+    public function addAttribute($name, $value)
     {
         $this->addAttributes([
             $name => $value
@@ -118,25 +120,24 @@ class Product extends Model
     // create multiple attributes a once
     public function addAttributes(array $attributes)
     {
-        $attributes = array_map(function($k,$v){
+        $attributes = array_map(function ($k, $v) {
             return [
                 'name' => $k,
                 'value' => $v
             ];
-        },array_keys($attributes) , array_values($attributes));
+        }, array_keys($attributes), array_values($attributes));
 
         $this->attributes()->createMany($attributes);
-
     }
 
     public function removeAttribute($name)
     {
-        $this->attributes()->where('name',$name)->first()->delete();
+        $this->attributes()->where('name', $name)->first()->delete();
     }
 
     public function currentStock()
     {
-        return $this->variants()->withSum('stocks','qty')->get()->sum('stocks_sum_qty') ?? 0;
+        return $this->variants()->withSum('stocks', 'qty')->get()->sum('stocks_sum_qty') ?? 0;
     }
 
     public function createOption($name)
@@ -147,4 +148,11 @@ class Product extends Model
     }
 
 
+    private  function sortName($name)
+    {
+        $name = explode("-", $name);
+        sort($name);
+
+        return implode("-", $name);
+    }
 }

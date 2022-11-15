@@ -167,17 +167,33 @@ class ProductTest extends TestCase
         $this->assertCount(3, $o->values);
     }
 
-      private function createSupplier()
+    public function test_createVariants()
     {
-        $adr = Address::create([
-                   'city' => 'Anuradhapura',
-                   'country' => 'LK'
-               ]);
+        $p = $this->createProduct();
 
-        return Supplier::create([
-            'name' => 'Supp one',
-            'address_id' => $adr
+        $v = $p->createVariant('blue-m-cotton');
+
+        $this->assertEquals('blue-cotton-m', $v->name); // check name is sorted
+        $this->assertTrue($p->hasVariant('m-blue-cotton')); // search using sorted name
+        $this->assertNotNull($p->findVariantByName('m-blue-cotton'));
+
+        $v->update([
+            'name' => 's-blue-pvc'
         ]);
+
+        $this->assertTrue($p->hasVariant('blue-s-pvc')); // search using sorted name
     }
 
+      private function createSupplier()
+      {
+          $adr = Address::create([
+                     'city' => 'Anuradhapura',
+                     'country' => 'LK'
+                 ]);
+
+          return Supplier::create([
+              'name' => 'Supp one',
+              'address_id' => $adr
+          ]);
+      }
 }
