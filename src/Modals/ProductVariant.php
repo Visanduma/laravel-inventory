@@ -2,8 +2,10 @@
 
 namespace Visanduma\LaravelInventory\Modals;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Visanduma\LaravelInventory\Exceptions\BatchNotFoundException;
+use Visanduma\LaravelInventory\Exceptions\SkuExistsException;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
 
 class ProductVariant extends Model
@@ -35,9 +37,13 @@ class ProductVariant extends Model
 
     public function assignSku($code)
     {
-        $this->sku()->updateOrCreate(['product_variant_id' => $this->id],[
-            'code' => $code
-        ]);
+        try{
+            $this->sku()->updateOrCreate(['product_variant_id' => $this->id],[
+                'code' => $code
+            ]);
+        }catch(Exception $e){
+            throw new SkuExistsException("SKU '{$code}' is already exists");
+        }
 
     }
 
@@ -98,7 +104,7 @@ class ProductVariant extends Model
 
     public function baseProduct()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class,'product_id');
     }
     public function getFullName()
     {
