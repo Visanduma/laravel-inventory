@@ -30,7 +30,7 @@ class ProductOption extends Model
     public function addValue(string $value)
     {
         $this->values()->create([
-            'value' => $value
+            'value' => trim($value)
         ]);
     }
 
@@ -39,5 +39,10 @@ class ProductOption extends Model
         foreach($values as $v){
             $this->addValue($v);
         }
+    }
+
+    public function valuesArray()
+    {
+        return $this->values->pluck('value')->toArray();
     }
 }

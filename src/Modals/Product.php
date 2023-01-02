@@ -79,13 +79,13 @@ class Product extends Model
     {
         return  $this->variants()->create([
              'name' => $this->sortName($name),
-             'description' => $description
+             'description' => $description,
          ]);
     }
 
     public function setCategory($category)
     {
-        if (!$category instanceof ProductCategory) {
+        if (! $category instanceof ProductCategory) {
             $category = ProductCategory::find($category);
         }
 
@@ -94,7 +94,7 @@ class Product extends Model
 
     public function setMetric($metric)
     {
-        if (!$metric instanceof Metric) {
+        if (! $metric instanceof Metric) {
             $metric = Metric::find($metric);
         }
 
@@ -114,16 +114,17 @@ class Product extends Model
     public function addAttribute($name, $value)
     {
         $this->addAttributes([
-            $name => $value
+            $name => $value,
         ]);
     }
+
     // create multiple attributes a once
     public function addAttributes(array $attributes)
     {
         $attributes = array_map(function ($k, $v) {
             return [
                 'name' => $k,
-                'value' => $v
+                'value' => $v,
             ];
         }, array_keys($attributes), array_values($attributes));
 
@@ -143,12 +144,16 @@ class Product extends Model
     public function createOption($name)
     {
         return $this->options()->create([
-            'name' => $name
+            'name' => $name,
         ]);
     }
 
+    public function hasOption($name)
+    {
+        return $this->options()->where('name', $name)->exists();
+    }
 
-    private  function sortName($name)
+    private function sortName($name)
     {
         $name = explode("-", $name);
         sort($name);
