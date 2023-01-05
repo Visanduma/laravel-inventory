@@ -77,14 +77,19 @@ class ProductVariant extends Model
         return $this->stock($batch)->qty > 0 ?? false;
     }
 
-    public function inAnyStock(): bool
+    public function inAnyStock($qty = 0): bool
     {
-        return $this->stocks()->sum('qty') > 0;
+        return $this->stocks()->sum('qty') > $qty;
     }
 
     public function hasStock($qty, $batch = 'default'): bool
     {
         return $this->stock($batch)->qty >= $qty;
+    }
+
+    public function hasCriticalStock(): bool
+    {
+        return !$this->inAnyStock($this->minimum_stock);
     }
 
     public function add($qty, $reason = null, $batch = 'default')

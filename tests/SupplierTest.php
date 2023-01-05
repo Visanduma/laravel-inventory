@@ -21,9 +21,8 @@ class SupplierTest extends TestCase
 
         $sup = Supplier::create([
             'name' => 'Supp one',
-            'address_id' => $adr
+            'address_id' => $adr->id
         ]);
-
 
         $this->assertCount(1, Supplier::all());
         $this->assertEquals('LK', $sup->address->country);

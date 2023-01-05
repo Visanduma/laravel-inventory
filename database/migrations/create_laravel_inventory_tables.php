@@ -66,6 +66,7 @@ return new class () extends Migration {
             $table->double('qty');
             $table->double('cost')->default(0);
             $table->double('price')->default(0);
+            $table->date('expire_at')->nullable();
             $table->unsignedBigInteger('supplier_id');
             $table->timestamps();
 
@@ -134,6 +135,7 @@ return new class () extends Migration {
             $table->unsignedBigInteger('product_id');
             $table->string('name');
             $table->text('description')->nullable();
+            $table->integer('minimum_stock')->default(0);
             $table->timestamps();
 
             $table->foreign('product_id')
@@ -154,15 +156,14 @@ return new class () extends Migration {
         });
 
         Schema::create($prefix . 'variant_values', function (Blueprint $table) use ($prefix) {
-                $table->unsignedBigInteger('variant_id');
-                $table->string('value');
+            $table->unsignedBigInteger('variant_id');
+            $table->string('value');
 
-                $table->foreign('variant_id')
-                        ->references('id')
-                        ->on($prefix.'variants')
-                        ->cascadeOnDelete();
+            $table->foreign('variant_id')
+                    ->references('id')
+                    ->on($prefix.'variants')
+                    ->cascadeOnDelete();
         });
-
     }
 
 

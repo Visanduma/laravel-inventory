@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Visanduma\LaravelInventory\Modals;
 
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Visanduma\LaravelInventory\Exceptions\QuantityTypeException;
@@ -13,11 +12,11 @@ use Visanduma\LaravelInventory\Modals\Supplier;
 
 class Stock extends Model
 {
-
     use TableConfigs;
 
     protected $tableName = "stocks";
     protected $guarded = [];
+    protected $dates = ['expire_at'];
 
 
     /*
@@ -30,8 +29,7 @@ class Stock extends Model
 
     public function product()
     {
-                return $this->belongsTo(ProductVariant::class, 'product_variant_id');
-
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 
 
@@ -42,7 +40,7 @@ class Stock extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class,'supplier_id');    
+        return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
 
@@ -63,7 +61,7 @@ class Stock extends Model
             'reason' => $reason
         ];
 
-       return $this->movements()->create($data);
+        return $this->movements()->create($data);
     }
 
     public function add(int $qty, $reason = null)
@@ -73,20 +71,17 @@ class Stock extends Model
         DB::beginTransaction();
 
         try {
-
             $mov = $this->addMovement($qty, $reason);
             $this->increment('qty', $qty);
 
             DB::commit();
 
             return $mov;
-
         } catch (\Exception $e) {
             DB::rollBack();
 
             return $e;
         }
-
     }
 
     public function take(int $qty, $reason = null)
@@ -96,14 +91,12 @@ class Stock extends Model
         DB::beginTransaction();
 
         try {
-
             $mov = $this->addMovement($qty, $reason);
             $this->decrement('qty', $qty);
 
             DB::commit();
 
             return $mov;
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -111,5 +104,8 @@ class Stock extends Model
         }
     }
 
-
+    public function hasExpired():bool
+    {
+        return $this->expire_at->isPast();
+    }
 }

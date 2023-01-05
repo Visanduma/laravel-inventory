@@ -143,6 +143,8 @@ class ProductTest extends TestCase
         $p = $this->createProduct();
 
         $v = $p->createVariant('red-m');
+
+
         $v->createStock('default', $this->createSupplier());
         $v->stock()->add(100);
 
@@ -150,6 +152,13 @@ class ProductTest extends TestCase
         $v->stock('new')->add(250);
 
         $this->assertEquals(350, $p->currentStock());
+
+
+        $v->update([
+            'minimum_stock' => 400
+        ]);
+
+        $this->assertTrue($v->hasCriticalStock());
 
         $this->assertTrue($p->hasVariant('red-m'));
         $this->assertFalse($p->hasVariant('blue-m'));

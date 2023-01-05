@@ -54,10 +54,20 @@ class StockTest extends TestCase
 
         $v = $prd->createVariant('default');
 
-        $v->createStock('default',$this->createSupplier()); // default batch
+        $stock = $v->createStock('default', $this->createSupplier()); // default batch
+        $stock->update([
+            'expire_at' => now()->addMonth()
+        ]);
 
-        $v->stock()->add(40);
+        $stock->add(40);
         $v->add(5); // short method
+
+        $this->assertFalse($stock->hasExpired());
+
+        // travel to future
+        $this->travelTo(now()->addMonths(2));
+
+        $this->assertTrue($stock->hasExpired());
 
         $this->assertEquals(45, $v->stock()->qty);
 
@@ -65,6 +75,7 @@ class StockTest extends TestCase
         $this->assertFalse($v->hasStock(50));
         $this->assertTrue($v->hasStock(35));
         $this->assertTrue($v->inAnyStock());
+        $this->assertFalse($v->inAnyStock(46));
 
         $v->stock()->take(5);
         $v->take(5); // short method
