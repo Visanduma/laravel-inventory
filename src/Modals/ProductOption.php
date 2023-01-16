@@ -40,6 +40,11 @@ class ProductOption extends Model
             $this->addValue($v);
         }
     }
+    
+     public function removeValue($name)
+    {
+        $this->values()->where('value',$name)->delete();
+    }
 
     public function valuesArray()
     {
