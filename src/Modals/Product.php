@@ -33,7 +33,7 @@ class Product extends Model
 
     public function variants()
     {
-        return $this->hasMany(ProductVariant::class);
+        return $this->hasMany(ProductVariant::class)->where('is_default', false);
     }
 
     public function attributes()
@@ -75,11 +75,12 @@ class Product extends Model
         return $this->variants()->where('name', $this->sortName($name))->first();
     }
 
-    public function createVariant($name, $description = null)
+    public function createVariant($name, $description = null, $default = false)
     {
         return  $this->variants()->create([
              'name' => $this->sortName($name),
              'description' => $description,
+             'is_default' => $default
          ]);
     }
 
