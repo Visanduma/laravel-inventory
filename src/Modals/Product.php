@@ -33,7 +33,12 @@ class Product extends Model
 
     public function variants()
     {
-        return $this->hasMany(ProductVariant::class)->where('is_default', false);
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function default()
+    {
+        return $this->hasOne(ProductVariant::class)->where('is_default', true);
     }
 
     public function attributes()
@@ -80,8 +85,13 @@ class Product extends Model
         return  $this->variants()->create([
              'name' => $this->sortName($name),
              'description' => $description,
-             'is_default' => $default
+             'is_default' => $default,
          ]);
+    }
+
+    public function createDefaultVariant()
+    {
+        return $this->createVariant('default', null, true);
     }
 
     public function setCategory($category)
@@ -105,6 +115,11 @@ class Product extends Model
     public function hasVariant($name): bool
     {
         return $this->variants()->where('name', $this->sortName($name))->exists();
+    }
+
+    public function hasDefaultVariant()
+    {
+        return $this->default()->exists();
     }
 
     public function hasVariants(): bool

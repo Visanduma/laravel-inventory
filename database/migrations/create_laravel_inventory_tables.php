@@ -16,8 +16,6 @@ return new class () extends Migration {
             $table->string('description')->nullable();
             $table->integer('category_id');
             $table->integer('metric_id');
-            $table->boolean('has_stocks')->default(true);
-            $table->boolean('has_variants')->default(false);
             // $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
 
@@ -137,7 +135,6 @@ return new class () extends Migration {
             $table->unsignedBigInteger('product_id');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->boolean('is_default')->default(false);
             $table->integer('minimum_stock')->default(0);
             $table->timestamps();
 
