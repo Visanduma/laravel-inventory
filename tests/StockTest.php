@@ -62,6 +62,8 @@ class StockTest extends TestCase
         $stock->add(40);
         $v->add(5); // short method
 
+        $this->assertEquals(45, $v->total_stock);
+
         $this->assertFalse($stock->hasExpired());
 
         // travel to future

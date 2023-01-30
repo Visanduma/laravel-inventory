@@ -73,6 +73,7 @@ class Stock extends Model
         try {
             $mov = $this->addMovement($qty, $reason);
             $this->increment('qty', $qty);
+            $this->product()->increment('total_stock', $qty);
 
             DB::commit();
 
@@ -93,6 +94,7 @@ class Stock extends Model
         try {
             $mov = $this->addMovement($qty, $reason);
             $this->decrement('qty', $qty);
+            $this->product()->decrement('total_stock', $qty);
 
             DB::commit();
 
@@ -104,7 +106,7 @@ class Stock extends Model
         }
     }
 
-    public function hasExpired():bool
+    public function hasExpired(): bool
     {
         return $this->expire_at->isPast();
     }

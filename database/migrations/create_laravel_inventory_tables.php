@@ -137,6 +137,7 @@ return new class () extends Migration {
             $table->text('description')->nullable();
             $table->boolean('is_default');
             $table->integer('minimum_stock')->default(0);
+            $table->integer('total_stock')->default(0);
             $table->timestamps();
 
             $table->foreign('product_id')
