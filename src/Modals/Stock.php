@@ -97,7 +97,7 @@ class Stock extends Model
             $this->product()->decrement('total_stock', $qty);
 
             DB::commit();
-
+            
             return $mov;
         } catch (\Exception $e) {
             DB::rollBack();

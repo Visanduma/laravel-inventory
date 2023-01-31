@@ -144,7 +144,6 @@ class ProductTest extends TestCase
 
         $v = $p->createVariant('red-m');
 
-
         $v->createStock('default', $this->createSupplier());
         $v->stock()->add(100);
 
@@ -152,6 +151,10 @@ class ProductTest extends TestCase
         $v->stock('new')->add(250);
 
         $this->assertEquals(350, $p->currentStock());
+
+        $v->refresh();
+
+        $this->assertEquals(350, $v->total_stock);
 
 
         $v->update([
