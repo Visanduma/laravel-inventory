@@ -185,12 +185,12 @@ class ProductTest extends TestCase
 
         $v = $p->createVariant('blue-m-cotton');
 
-        $this->assertEquals('blue-cotton-m', $v->name); // check name is sorted
+        $this->assertEquals('blue-cotton-m', $v->options); // check options name is sorted
         $this->assertTrue($p->hasVariant('m-blue-cotton')); // search using sorted name
         $this->assertNotNull($p->findVariantByName('m-blue-cotton'));
 
         $v->update([
-            'name' => 's-blue-pvc'
+            'options' => 'blue-pvc-s'
         ]);
 
         $this->assertTrue($p->hasVariant('blue-s-pvc')); // search using sorted name

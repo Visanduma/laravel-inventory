@@ -77,13 +77,16 @@ class Product extends Model
 
     public function findVariantByName($name)
     {
-        return $this->variants()->where('name', $this->sortName($name))->first();
+        return $this->variants()->where('options', $this->sortName($name))->first();
     }
 
     public function createVariant($name, $description = null, $default = false)
     {
+        $vname = $this->name." ".$this->sortName($name);
+
         return  $this->variants()->create([
-             'name' => $this->sortName($name),
+             'name' => $default ? $this->name : $vname,
+             'options' => $default ? null : $this->sortName($name),
              'description' => $description,
              'is_default' => $default,
          ]);
@@ -114,7 +117,7 @@ class Product extends Model
 
     public function hasVariant($name): bool
     {
-        return $this->variants()->where('name', $this->sortName($name))->exists();
+        return $this->variants()->where('options', $this->sortName($name))->exists();
     }
 
     public function hasDefaultVariant()

@@ -19,7 +19,7 @@ class ProductVariant extends Model
     public static function boot()
     {
         parent::boot();
-        static::updating(function($item){
+        static::updating(function ($item) {
             $item->name = self::sortName($item->name);
         });
     }
@@ -28,6 +28,7 @@ class ProductVariant extends Model
     {
         return $this->hasOne(ProductSku::class);
     }
+
       public function stocks()
       {
           return $this->hasMany(Stock::class);
@@ -37,14 +38,13 @@ class ProductVariant extends Model
 
     public function assignSku($code)
     {
-        try{
-            $this->sku()->updateOrCreate(['product_variant_id' => $this->id],[
-                'code' => $code
+        try {
+            $this->sku()->updateOrCreate(['product_variant_id' => $this->id], [
+                'code' => $code,
             ]);
-        }catch(Exception $e){
+        } catch(Exception $e) {
             throw new SkuExistsException("SKU '{$code}' is already exists");
         }
-
     }
 
      public function getSku()
@@ -59,7 +59,7 @@ class ProductVariant extends Model
             'qty' => 0,
             'price' => 0,
             'cost' => 0,
-            'supplier_id' => $supplier->id
+            'supplier_id' => $supplier->id,
         ]);
     }
 
@@ -89,7 +89,7 @@ class ProductVariant extends Model
 
     public function hasCriticalStock(): bool
     {
-        return !$this->inAnyStock($this->minimum_stock);
+        return ! $this->inAnyStock($this->minimum_stock);
     }
 
     public function add($qty, $reason = null, $batch = 'default')
@@ -104,23 +104,24 @@ class ProductVariant extends Model
 
     public function totalInStock()
     {
-        return $this->stock()->sum('qty');
+        return $this->stocks()->sum('qty');
     }
 
     public function baseProduct()
     {
-        return $this->belongsTo(Product::class,'product_id');
+        return $this->belongsTo(Product::class, 'product_id');
     }
+
     public function getFullName()
     {
         return $this->baseProduct->name . " | " . $this->name;
     }
 
      private static function sortName($name)
-    {
-        $name = explode("-", $name);
-        sort($name);
+     {
+         $name = explode("-", $name);
+         sort($name);
 
-        return implode("-", $name);
-    }
+         return implode("-", $name);
+     }
 }
