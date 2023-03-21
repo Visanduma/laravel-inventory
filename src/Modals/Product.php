@@ -3,12 +3,14 @@
 namespace Visanduma\LaravelInventory\Modals;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Visanduma\LaravelInventory\Traits\HasAttributes;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
 
 class Product extends Model
 {
-    use TableConfigs;
+    use TableConfigs, HasAttributes;
 
     protected $tableName = "products";
 
@@ -39,11 +41,6 @@ class Product extends Model
     public function default()
     {
         return $this->hasOne(ProductVariant::class)->where('is_default', true);
-    }
-
-    public function attributes()
-    {
-        return $this->hasMany(Attribute::class);
     }
 
     public function options()
@@ -80,16 +77,21 @@ class Product extends Model
         return $this->variants()->where('options', $this->sortName($name))->first();
     }
 
-    public function createVariant($name, $description = null, $default = false)
+    public function createVariant($options = [])
     {
-        $vname = $this->name." ".$this->sortName($name);
 
-        return  $this->variants()->create([
-             'name' => $default ? $this->name : $vname,
-             'options' => $default ? null : $this->sortName($name),
-             'description' => $description,
-             'is_default' => $default,
-         ]);
+        $v = $this->variants()->create([
+            'name' => $this->name
+        ]);
+
+        foreach ($options as $key => $op) {
+            $this->createOption($key, $op);
+        }
+
+
+
+
+        return  $v;
     }
 
     public function createDefaultVariant()
@@ -99,7 +101,7 @@ class Product extends Model
 
     public function setCategory($category)
     {
-        if (! $category instanceof ProductCategory) {
+        if (!$category instanceof ProductCategory) {
             $category = ProductCategory::find($category);
         }
 
@@ -108,7 +110,7 @@ class Product extends Model
 
     public function setMetric($metric)
     {
-        if (! $metric instanceof Metric) {
+        if (!$metric instanceof Metric) {
             $metric = Metric::find($metric);
         }
 
@@ -127,32 +129,7 @@ class Product extends Model
 
     public function hasVariants(): bool
     {
-        return $this->variants()->count() > 0 ;
-    }
-
-    public function addAttribute($name, $value)
-    {
-        $this->addAttributes([
-            $name => $value,
-        ]);
-    }
-
-    // create multiple attributes a once
-    public function addAttributes(array $attributes)
-    {
-        $attributes = array_map(function ($k, $v) {
-            return [
-                'name' => $k,
-                'value' => $v,
-            ];
-        }, array_keys($attributes), array_values($attributes));
-
-        $this->attributes()->createMany($attributes);
-    }
-
-    public function removeAttribute($name)
-    {
-        $this->attributes()->where('name', $name)->first()->delete();
+        return $this->variants()->count() > 0;
     }
 
     public function currentStock()
@@ -160,16 +137,35 @@ class Product extends Model
         return $this->variants()->withSum('stocks', 'qty')->get()->sum('stocks_sum_qty') ?? 0;
     }
 
-    public function createOption($name)
+    public function createOption($name, $values = null)
     {
-        return $this->options()->create([
+        $op =  $this->options()->firstOrCreate([
             'name' => $name,
         ]);
+
+
+        if ($values) {
+
+            $values = array_map(function ($el) {
+                return [
+                    'value' => $el
+                ];
+            }, $values);
+
+            $op->values()->createMany($values);
+        }
+
+        return $op;
     }
 
     public function hasOption($name)
     {
         return $this->options()->where('name', $name)->exists();
+    }
+
+    public function getOption($name)
+    {
+        return $this->options()->where('name', $name)->with('values')->first();
     }
 
     private function sortName($name)

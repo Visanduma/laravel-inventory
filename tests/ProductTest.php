@@ -68,26 +68,35 @@ class ProductTest extends TestCase
     {
         $p = $this->createProduct();
 
-        $p->createVariant('red-m');
+        $p->createVariant();
 
         $this->assertEquals(1, $p->variants->count());
+    }
+
+    public function test_createVariantAndAssignOptions()
+    {
+        $p = $this->createProduct();
+        $p->createOption('color', ['blue', 'green', 'red']);
+        $p->createOption('size', ['sm', 'md', 'lg']);
+
+        $this->assertTrue($p->hasOption('color'));
+        $this->assertCount(3, $p->getOption('color')->values);
+
+        $v = $p->createVariant();
+        $v->options()->sync([1, 2]);
+        $this->assertCount(2, $v->options);
+        $this->assertEquals('blue', $v->options->first->option->value);
     }
 
     public function test_createSkuCodeForProductVariant()
     {
         $p = $this->createProduct();
 
-        $v = $p->createVariant('red-m');
+        $v = $p->createVariant();
 
         $v->assignSku('vb555');
 
         $this->assertEquals('vb555', $v->getSku());
-
-        $v->assignSku('bb666');
-
-        $v->refresh();
-
-        $this->assertEquals('bb666', $v->getSku());
     }
 
     private function createProductCategory()
@@ -101,7 +110,7 @@ class ProductTest extends TestCase
     public function test_findProductBySku()
     {
         $p = $this->createProduct();
-        $v = $p->createVariant('red-m');
+        $v = $p->createVariant();
         $v->assignSku('RM222');
 
         $result = Product::findBySku('RM222');
@@ -109,7 +118,7 @@ class ProductTest extends TestCase
         $this->assertEquals($p->id, $result->id);
     }
 
-    public function test_createAttributesForProduct()
+    public function test_createAttributesForProductAndVariant()
     {
         $p = $this->createProduct();
 
@@ -122,6 +131,11 @@ class ProductTest extends TestCase
         ]);
 
         $this->assertCount(3, $p->attributes);
+
+        $v = $p->createVariant();
+        $v->addAttribute('Time', '4min');
+
+        $this->assertCount(1, $v->attributes);
     }
 
 
@@ -129,9 +143,9 @@ class ProductTest extends TestCase
     {
         $p = $this->createProduct();
         $p->addAttributes([
-                    'brand' => 'redmi',
-                    'color' => 'silver'
-                ]);
+            'brand' => 'redmi',
+            'color' => 'silver'
+        ]);
 
         $p->removeAttribute('brand');
 
@@ -142,7 +156,7 @@ class ProductTest extends TestCase
     {
         $p = $this->createProduct();
 
-        $v = $p->createVariant('red-m');
+        $v = $p->createVariant();
 
         $v->createStock('default', $this->createSupplier());
         $v->stock()->add(100);
@@ -162,9 +176,6 @@ class ProductTest extends TestCase
         ]);
 
         $this->assertTrue($v->hasCriticalStock());
-
-        $this->assertTrue($p->hasVariant('red-m'));
-        $this->assertFalse($p->hasVariant('blue-m'));
     }
 
     public function test_createOptionsAndValues()
@@ -174,7 +185,7 @@ class ProductTest extends TestCase
         $this->assertCount(1, $p->options);
 
         $o->addValue('green');
-        $o->addValues(['blue','red']);
+        $o->addValues(['blue', 'red']);
 
         $this->assertCount(3, $o->values);
     }
@@ -183,29 +194,25 @@ class ProductTest extends TestCase
     {
         $p = $this->createProduct();
 
-        $v = $p->createVariant('blue-m-cotton');
-
-        $this->assertEquals('blue-cotton-m', $v->options); // check options name is sorted
-        $this->assertTrue($p->hasVariant('m-blue-cotton')); // search using sorted name
-        $this->assertNotNull($p->findVariantByName('m-blue-cotton'));
-
-        $v->update([
-            'options' => 'blue-pvc-s'
+        $v = $p->createVariant([
+            'weight' => [400, 600, 1000],
+            'flavor' => ['vanilla', 'chocolate']
         ]);
 
-        $this->assertTrue($p->hasVariant('blue-s-pvc')); // search using sorted name
+
+        $this->assertTrue($p->hasVariants()); // search using sorted name
     }
 
-      private function createSupplier()
-      {
-          $adr = Address::create([
-                     'city' => 'Anuradhapura',
-                     'country' => 'LK'
-                 ]);
+    private function createSupplier()
+    {
+        $adr = Address::create([
+            'city' => 'Anuradhapura',
+            'country' => 'LK'
+        ]);
 
-          return Supplier::create([
-              'name' => 'Supp one',
-              'address_id' => $adr
-          ]);
-      }
+        return Supplier::create([
+            'name' => 'Supp one',
+            'address_id' => $adr
+        ]);
+    }
 }

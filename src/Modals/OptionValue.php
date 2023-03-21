@@ -9,13 +9,13 @@ class OptionValue extends Model
 {
     use TableConfigs;
 
-    protected $tableName = "variant_values";
+    protected $tableName = "option_values";
     protected $guarded = [];
     public $timestamps = null;
 
 
     public function option()
     {
-        return $this->belongsTo(ProductOption::class, 'variant__id');
+        return $this->belongsTo(ProductOption::class, 'option_id');
     }
 }

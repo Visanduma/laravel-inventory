@@ -6,11 +6,12 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Visanduma\LaravelInventory\Exceptions\BatchNotFoundException;
 use Visanduma\LaravelInventory\Exceptions\SkuExistsException;
+use Visanduma\LaravelInventory\Traits\HasAttributes;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
 
 class ProductVariant extends Model
 {
-    use TableConfigs;
+    use TableConfigs, HasAttributes;
 
     protected $tableName = "product_variants";
 
@@ -19,9 +20,9 @@ class ProductVariant extends Model
     public static function boot()
     {
         parent::boot();
-        static::updating(function ($item) {
-            $item->name = self::sortName($item->name);
-        });
+        // static::updating(function ($item) {
+        //     $item->name = self::sortName($item->name);
+        // });
     }
 
     public function sku()
@@ -32,6 +33,11 @@ class ProductVariant extends Model
       public function stocks()
       {
           return $this->hasMany(Stock::class);
+      }
+
+      public function options()
+      {
+            return $this->belongsToMany(OptionValue::class, $this->getTableName('product_variant_option_values'), 'product_variant_id', 'option_value_id');
       }
 
     // methods
@@ -115,6 +121,13 @@ class ProductVariant extends Model
     public function getFullName()
     {
         return $this->baseProduct->name . " | " . $this->name;
+    }
+
+    public static function findBySku($sku)
+    {
+        return static::whereHas('sku', function ($q) use ($sku) {
+            $q->where('code', $sku);
+        })->first();
     }
 
      private static function sortName($name)

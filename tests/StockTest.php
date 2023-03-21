@@ -14,7 +14,7 @@ class StockTest extends TestCase
     public function test_createStockForProductVariant()
     {
         $prd = $this->createProduct();
-        $v = $prd->createVariant('default');
+        $v = $prd->createVariant();
         $supplier = $this->createSupplier();
 
         $v->createStock('default', $supplier); // default batch
@@ -38,9 +38,9 @@ class StockTest extends TestCase
     private function createSupplier()
     {
         $adr = Address::create([
-                   'city' => 'Anuradhapura',
-                   'country' => 'LK'
-               ]);
+            'city' => 'Anuradhapura',
+            'country' => 'LK'
+        ]);
 
         return Supplier::create([
             'name' => 'Supp one',
@@ -52,7 +52,7 @@ class StockTest extends TestCase
     {
         $prd = $this->createProduct();
 
-        $v = $prd->createVariant('default');
+        $v = $prd->createVariant();
 
         $stock = $v->createStock('default', $this->createSupplier()); // default batch
         $stock->update([

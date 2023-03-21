@@ -9,7 +9,7 @@ class ProductOption extends Model
 {
     use TableConfigs;
 
-    protected $tableName = "variants";
+    protected $tableName = "options";
     protected $guarded = [];
     public $timestamps = null;
 
@@ -21,7 +21,7 @@ class ProductOption extends Model
 
     public function values()
     {
-        return $this->hasMany(OptionValue::class,'variant_id');
+        return $this->hasMany(OptionValue::class, 'option_id');
     }
 
 
@@ -36,14 +36,14 @@ class ProductOption extends Model
 
     public function addValues(array $values)
     {
-        foreach($values as $v){
+        foreach ($values as $v) {
             $this->addValue($v);
         }
     }
-    
-     public function removeValue($name)
+
+    public function removeValue($name)
     {
-        $this->values()->where('value',$name)->delete();
+        $this->values()->where('value', $name)->delete();
     }
 
     public function valuesArray()
