@@ -118,9 +118,17 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class, 'product_id');
     }
 
-    public function getFullName()
+   public function getFullName($separator = ' - ')
     {
-        return $this->baseProduct->name . " | " . $this->name;
+        if ($this->options->isEmpty()) {
+            return $this->name;
+        }
+        return $this->name . $separator . $this->optionString($separator);
+    }
+
+    public function optionString($separator)
+    {
+        return implode($separator, $this->options->pluck('value')->toArray());
     }
 
     public static function findBySku($sku)
