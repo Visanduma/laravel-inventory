@@ -16,6 +16,7 @@ class ProductVariant extends Model
     protected $tableName = "product_variants";
 
     protected $guarded = [];
+    protected $appends = ['full_name'];
 
     public static function boot()
     {
@@ -30,15 +31,20 @@ class ProductVariant extends Model
         return $this->hasOne(ProductSku::class);
     }
 
-      public function stocks()
-      {
-          return $this->hasMany(Stock::class);
-      }
+    public function stocks()
+    {
+        return $this->hasMany(Stock::class);
+    }
 
-      public function options()
-      {
-            return $this->belongsToMany(OptionValue::class, $this->getTableName('product_variant_option_values'), 'product_variant_id', 'option_value_id');
-      }
+    public function options()
+    {
+        return $this->belongsToMany(OptionValue::class, $this->getTableName('product_variant_option_values'), 'product_variant_id', 'option_value_id');
+    }
+
+    public function getFullNameAttribute()
+    {
+        return $this->getFullName();
+    }
 
     // methods
 
@@ -48,15 +54,15 @@ class ProductVariant extends Model
             $this->sku()->updateOrCreate(['product_variant_id' => $this->id], [
                 'code' => $code,
             ]);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new SkuExistsException("SKU '{$code}' is already exists");
         }
     }
 
-     public function getSku()
-     {
-         return $this->sku->code ?? null;
-     }
+    public function getSku()
+    {
+        return $this->sku->code ?? null;
+    }
 
     public function createStock($batch = 'default', Supplier $supplier): Stock
     {
@@ -95,7 +101,7 @@ class ProductVariant extends Model
 
     public function hasCriticalStock(): bool
     {
-        return ! $this->inAnyStock($this->minimum_stock);
+        return !$this->inAnyStock($this->minimum_stock);
     }
 
     public function add($qty, $reason = null, $batch = 'default')
@@ -118,7 +124,7 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class, 'product_id');
     }
 
-   public function getFullName($separator = ' - ')
+    public function getFullName($separator = ' - ')
     {
         if ($this->options->isEmpty()) {
             return $this->name;
@@ -138,11 +144,11 @@ class ProductVariant extends Model
         })->first();
     }
 
-     private static function sortName($name)
-     {
-         $name = explode("-", $name);
-         sort($name);
+    private static function sortName($name)
+    {
+        $name = explode("-", $name);
+        sort($name);
 
-         return implode("-", $name);
-     }
+        return implode("-", $name);
+    }
 }
