@@ -57,6 +57,7 @@ class Stock extends Model
         $data = [
             'before' => $this->qty,
             'after' => $this->qty + $qty,
+            'qty' => $this->qty,
             'user_id' => auth()->id(),
             'reason' => $reason
         ];
@@ -92,12 +93,12 @@ class Stock extends Model
         DB::beginTransaction();
 
         try {
-            $mov = $this->addMovement($qty, $reason);
+            $mov = $this->addMovement(-$qty, $reason);
             $this->decrement('qty', $qty);
             $this->product()->decrement('total_stock', $qty);
 
             DB::commit();
-            
+
             return $mov;
         } catch (\Exception $e) {
             DB::rollBack();
