@@ -151,4 +151,9 @@ class ProductVariant extends Model
 
         return implode("-", $name);
     }
+    
+     public function latestSellingPrice()
+    {
+        return $this->stocks()->first()->price ?? 0;
+    }
 }
