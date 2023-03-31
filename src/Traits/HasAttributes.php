@@ -35,4 +35,9 @@ trait HasAttributes {
     {
         $this->attributes()->where('name', $name)->first()->delete();
     }
+
+    public function attr($key, $default= null)
+    {
+        return $this->attributes()->where('name',$key)->first()->value ?? $default;
+    }
 }
