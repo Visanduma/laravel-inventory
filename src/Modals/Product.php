@@ -3,8 +3,8 @@
 namespace Visanduma\LaravelInventory\Modals;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Visanduma\LaravelInventory\Exceptions\BatchNotFoundException;
 use Visanduma\LaravelInventory\Traits\HasAttributes;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
 
@@ -33,20 +33,11 @@ class Product extends Model
         return $this->belongsTo(Metric::class, 'metric_id');
     }
 
-    public function variants()
+    public function stocks()
     {
-        return $this->hasMany(ProductVariant::class, 'product_id', 'id');
+        return $this->hasMany(Stock::class);
     }
 
-    public function default()
-    {
-        return $this->hasOne(ProductVariant::class)->where('is_default', true);
-    }
-
-    public function options()
-    {
-        return $this->hasMany(ProductOption::class,'product_id');
-    }
 
 
     /*
@@ -67,112 +58,67 @@ class Product extends Model
 
     public static function findBySku($sku)
     {
-        return ProductVariant::whereHas('sku', function ($q) use ($sku) {
-            $q->where('code', $sku);
-        })->first();
+        return static::where('sku',$sku)->first();
     }
 
-    public function findVariantByName($name)
+    public function assignSku($sku)
     {
-        return $this->variants()->where('options', $this->sortName($name))->first();
-    }
-
-    public function createVariant($options = [])
-    {
-
-        $v = $this->variants()->create([
-            'name' => $this->name
+        return $this->update([
+            'sku' => $sku
         ]);
-
-        foreach ($options as $key => $op) {
-            $this->createOption($key, $op);
-        }
-
-
-
-
-        return  $v;
     }
 
-    public function createDefaultVariant()
+    public function createStock($batch, Supplier $supplier)
     {
-        return $this->createVariant('default', null, true);
-    }
-
-    public function setCategory($category)
-    {
-        if (!$category instanceof ProductCategory) {
-            $category = ProductCategory::find($category);
-        }
-
-        $this->category()->associate($category);
-    }
-
-    public function setMetric($metric)
-    {
-        if (!$metric instanceof Metric) {
-            $metric = Metric::find($metric);
-        }
-
-        $this->metric()->associate($metric);
-    }
-
-    public function hasVariant($name): bool
-    {
-        return $this->variants()->where('options', $this->sortName($name))->exists();
-    }
-
-    public function hasDefaultVariant()
-    {
-        return $this->default()->exists();
-    }
-
-    public function hasVariants(): bool
-    {
-        return $this->variants()->count() > 0;
-    }
-
-    public function currentStock()
-    {
-        return $this->variants()->withSum('stocks', 'qty')->get()->sum('stocks_sum_qty') ?? 0;
-    }
-
-    public function createOption($name, $values = null)
-    {
-        $op =  $this->options()->firstOrCreate([
-            'name' => $name,
+        return $this->stocks()->create([
+            'batch' => $batch,
+            'qty' => 0,
+            'supplier_id' => $supplier->id
         ]);
+    }
 
-
-        if ($values) {
-
-            $values = array_map(function ($el) {
-                return [
-                    'value' => $el
-                ];
-            }, $values);
-
-            $op->values()->createMany($values);
+    public function stock($batch = 'default'): Stock
+    {
+        if ($this->stocks()->where('batch', $batch)->exists()) {
+            return $this->stocks()->where('batch', $batch)->first();
+        } else {
+            throw new BatchNotFoundException();
         }
-
-        return $op;
     }
 
-    public function hasOption($name)
+    public function totalInStock()
     {
-        return $this->options()->where('name', $name)->exists();
+        return $this->stocks()->sum('qty');
     }
 
-    public function getOption($name)
+    public function hasCriticalStock(): bool
     {
-        return $this->options()->where('name', $name)->with('values')->first();
+        return $this->totalInStock() < $this->minimum_stock;
     }
 
-    private function sortName($name)
+    public function add($qty, $reason = null, $batch = 'default')
     {
-        $name = explode("-", $name);
-        sort($name);
-
-        return implode("-", $name);
+        return $this->stock($batch)->add($qty, $reason);
     }
+
+    public function take($qty, $reason = null, $batch = 'default')
+    {
+        return $this->stock($batch)->take($qty, $reason);
+    }
+
+    public function inStock($batch = 'default'): bool
+    {
+        return $this->stock($batch)->qty > 0 ?? false;
+    }
+
+    public function inAnyStock($qty = 0): bool
+    {
+        return $this->stocks()->sum('qty') > $qty;
+    }
+
+    public function hasStock($qty, $batch = 'default'): bool
+    {
+        return $this->stock($batch)->qty >= $qty;
+    }
+
 }

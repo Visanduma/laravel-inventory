@@ -38,9 +38,4 @@ class ProductCategory extends Model
     |
     */
 
-    public function setParent($category)
-    {
-        // todo this must e test
-        $this->parent()->associate($category);
-    }
 }

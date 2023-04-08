@@ -29,7 +29,7 @@ class Stock extends Model
 
     public function product()
     {
-        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+        return $this->belongsTo(Product::class, 'product_id');
     }
 
 
@@ -74,7 +74,7 @@ class Stock extends Model
         try {
             $mov = $this->addMovement($qty, $reason);
             $this->increment('qty', $qty);
-            $this->product()->increment('total_stock', $qty);
+            // $this->product()->increment('total_stock', $qty);
 
             DB::commit();
 
@@ -95,7 +95,7 @@ class Stock extends Model
         try {
             $mov = $this->addMovement(-$qty, $reason);
             $this->decrement('qty', $qty);
-            $this->product()->decrement('total_stock', $qty);
+            // $this->product()->decrement('total_stock', $qty);
 
             DB::commit();
 

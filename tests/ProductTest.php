@@ -43,7 +43,6 @@ class ProductTest extends TestCase
         ]);
 
         $p->category()->associate($c);
-        $p->setCategory($c);
 
 
         $this->assertEquals('Cat one', $p->category->name);
@@ -59,44 +58,17 @@ class ProductTest extends TestCase
         ]);
 
         $p->metric()->associate($m);
-        $p->setMetric($m);
 
         $this->assertEquals('Kg', $p->metric->symbol);
-    }
-
-    public function test_createProductVariant()
-    {
-        $p = $this->createProduct();
-
-        $p->createVariant();
-
-        $this->assertEquals(1, $p->variants->count());
-    }
-
-    public function test_createVariantAndAssignOptions()
-    {
-        $p = $this->createProduct();
-        $p->createOption('color', ['blue', 'green', 'red']);
-        $p->createOption('size', ['sm', 'md', 'lg']);
-
-        $this->assertTrue($p->hasOption('color'));
-        $this->assertCount(3, $p->getOption('color')->values);
-
-        $v = $p->createVariant();
-        $v->options()->sync([1, 2]);
-        $this->assertCount(2, $v->options);
-        $this->assertEquals('blue', $v->options->first->option->value);
     }
 
     public function test_createSkuCodeForProductVariant()
     {
         $p = $this->createProduct();
 
-        $v = $p->createVariant();
+        $p->assignSku('vb555');
 
-        $v->assignSku('vb555');
-
-        $this->assertEquals('vb555', $v->getSku());
+        $this->assertEquals('vb555', $p->sku);
     }
 
     private function createProductCategory()
@@ -110,8 +82,8 @@ class ProductTest extends TestCase
     public function test_findProductBySku()
     {
         $p = $this->createProduct();
-        $v = $p->createVariant();
-        $v->assignSku('RM222');
+
+        $p->assignSku('RM222');
 
         $result = Product::findBySku('RM222');
 
@@ -131,11 +103,6 @@ class ProductTest extends TestCase
         ]);
 
         $this->assertCount(3, $p->attributes);
-
-        $v = $p->createVariant();
-        $v->addAttribute('Time', '4min');
-
-        $this->assertCount(1, $v->attributes);
     }
 
 
@@ -156,51 +123,21 @@ class ProductTest extends TestCase
     {
         $p = $this->createProduct();
 
-        $v = $p->createVariant();
+        $p->createStock('default', $this->createSupplier());
+        $p->stock()->add(100);
 
-        $v->createStock('default', $this->createSupplier());
-        $v->stock()->add(100);
+        $p->createStock('new', $this->createSupplier());
+        $p->stock('new')->add(250);
 
-        $v->createStock('new', $this->createSupplier());
-        $v->stock('new')->add(250);
+        $p->refresh();
 
-        $this->assertEquals(350, $p->currentStock());
+        $this->assertEquals(350, $p->totalInStock());
 
-        $v->refresh();
-
-        $this->assertEquals(350, $v->total_stock);
-
-
-        $v->update([
+        $p->update([
             'minimum_stock' => 400
         ]);
 
-        $this->assertTrue($v->hasCriticalStock());
-    }
-
-    public function test_createOptionsAndValues()
-    {
-        $p = $this->createProduct();
-        $o = $p->createOption('color');
-        $this->assertCount(1, $p->options);
-
-        $o->addValue('green');
-        $o->addValues(['blue', 'red']);
-
-        $this->assertCount(3, $o->values);
-    }
-
-    public function test_createVariants()
-    {
-        $p = $this->createProduct();
-
-        $v = $p->createVariant([
-            'weight' => [400, 600, 1000],
-            'flavor' => ['vanilla', 'chocolate']
-        ]);
-
-
-        $this->assertTrue($p->hasVariants()); // search using sorted name
+        $this->assertTrue($p->hasCriticalStock());
     }
 
     private function createSupplier()

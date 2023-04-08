@@ -13,13 +13,12 @@ class StockTest extends TestCase
 
     public function test_createStockForProductVariant()
     {
-        $prd = $this->createProduct();
-        $v = $prd->createVariant();
+        $p = $this->createProduct();
         $supplier = $this->createSupplier();
 
-        $v->createStock('default', $supplier); // default batch
+        $p->createStock('default', $supplier); // default batch
 
-        $this->assertCount(1, $v->stocks);
+        $this->assertCount(1, $p->stocks);
     }
 
     private function createProduct(array $data = []): Product
@@ -47,20 +46,19 @@ class StockTest extends TestCase
             'address_id' => $adr
         ]);
     }
-
+    
     public function test_checkProductsHelpers()
     {
-        $prd = $this->createProduct();
+        $p = $this->createProduct();
 
-        $v = $prd->createVariant();
 
-        $stock = $v->createStock('default', $this->createSupplier()); // default batch
+        $stock = $p->createStock('default', $this->createSupplier()); // default batch
         $stock->update([
             'expire_at' => now()->addMonth()
         ]);
 
         $stock->add(40);
-        $v->add(5); // short method
+        $p->add(5); // short method
 
         $this->assertFalse($stock->hasExpired());
 
@@ -69,20 +67,19 @@ class StockTest extends TestCase
 
         $this->assertTrue($stock->hasExpired());
 
-        $this->assertEquals(45, $v->stock()->qty);
+        $this->assertEquals(45, $p->stock()->qty);
 
-        $this->assertTrue($v->inStock());
-        $this->assertFalse($v->hasStock(50));
-        $this->assertTrue($v->hasStock(35));
-        $this->assertTrue($v->inAnyStock());
-        $this->assertFalse($v->inAnyStock(46));
+        $this->assertTrue($p->inStock());
+        $this->assertFalse($p->hasStock(50));
+        $this->assertTrue($p->hasStock(35));
+        $this->assertTrue($p->inAnyStock());
+        $this->assertFalse($p->inAnyStock(46));
 
-        $v->stock()->take(5);
-        $v->take(5); // short method
+        $p->stock()->take(5);
+        $p->take(5); // short method
 
-        $v->refresh();
-        $this->assertEquals(35, $v->stock()->qty);
-        $this->assertEquals(35, $v->totalInStock());
-        $this->assertEquals(35, $v->total_stock);
+        $p->refresh();
+        $this->assertEquals(35, $p->stock()->qty);
+        $this->assertEquals(35, $p->totalInStock());
     }
 }
