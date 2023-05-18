@@ -29,7 +29,7 @@ class Stock extends Model
 
     public function product()
     {
-        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+        return $this->belongsTo(config('inventory.models.product-variant'), 'product_variant_id');
     }
 
 
@@ -40,7 +40,7 @@ class Stock extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class, 'supplier_id');
+        return $this->belongsTo(config('inventory.models.supplier'), 'supplier_id');
     }
 
 

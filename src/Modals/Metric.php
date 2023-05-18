@@ -17,6 +17,6 @@ class Metric extends Model
 
     public function products()
     {
-        return $this->hasMany(Product::class, 'metric_id');
+        return $this->hasMany(config('inventory.models.product'), 'metric_id');
     }
 }

@@ -35,12 +35,12 @@ class Product extends Model
 
     public function variants()
     {
-        return $this->hasMany(ProductVariant::class, 'product_id', 'id');
+        return $this->hasMany(config('inventory.models.product-variant'), 'product_id', 'id');
     }
 
     public function default()
     {
-        return $this->hasOne(ProductVariant::class)->where('is_default', true);
+        return $this->hasOne(config('inventory.models.product-variant'))->where('is_default', true);
     }
 
     public function options()
@@ -87,9 +87,6 @@ class Product extends Model
         foreach ($options as $key => $op) {
             $this->createOption($key, $op);
         }
-
-
-
 
         return  $v;
     }

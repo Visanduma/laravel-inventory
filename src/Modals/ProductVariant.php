@@ -121,7 +121,7 @@ class ProductVariant extends Model
 
     public function baseProduct()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(config('inventory.models.product'), 'product_id');
     }
 
     public function getFullName($separator = ' - ')

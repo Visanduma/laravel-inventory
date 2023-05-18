@@ -18,6 +18,6 @@ class ProductSku extends Model
 
     public function product()
     {
-        return $this->belongsTo(ProductVariant::class, 'product_id');
+        return $this->belongsTo(config('inventory.models.product-variant'), 'product_id');
     }
 }

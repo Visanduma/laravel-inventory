@@ -22,13 +22,11 @@ class Supplier extends Model
 
     public function address()
     {
-        return $this->hasOne(Address::class, 'id','address_id');
+        return $this->hasOne(config('inventory.models.address'), 'id', 'address_id');
     }
 
     public function stocks()
     {
         return $this->hasMany(Stock::class);
     }
-
-
 }
