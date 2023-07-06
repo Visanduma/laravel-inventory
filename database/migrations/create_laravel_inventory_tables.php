@@ -203,5 +203,6 @@ return new class() extends Migration
         Schema::dropIfExists($prefix . 'product_variants');
         Schema::dropIfExists($prefix . 'options');
         Schema::dropIfExists($prefix . 'option_values');
+        Schema::dropIfExists($prefix . 'product_variant_option_values');
     }
 };
