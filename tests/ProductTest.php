@@ -3,11 +3,15 @@
 namespace Visanduma\LaravelInventory\Tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Visanduma\LaravelInventory\Events\InventoryStockUpdate;
+use Visanduma\LaravelInventory\Listeners\StockUpdate;
+use Visanduma\LaravelInventory\Modals\Address;
 use Visanduma\LaravelInventory\Modals\Metric;
 use Visanduma\LaravelInventory\Modals\Product;
 use Visanduma\LaravelInventory\Modals\ProductCategory;
 use Visanduma\LaravelInventory\Modals\Supplier;
-use Visanduma\LaravelInventory\Modals\Address;
+
+use function PHPUnit\Framework\assertEquals;
 
 class ProductTest extends TestCase
 {
@@ -201,6 +205,25 @@ class ProductTest extends TestCase
 
 
         $this->assertTrue($p->hasVariants()); // search using sorted name
+    }
+
+    public function test_stockEvents()
+    {
+        $p = $this->createProduct();
+        $v = $p->createVariant();
+
+        $v->createStock('default', $this->createSupplier());
+        $v->stock()->add(100);
+
+        $listener = app()->make(StockUpdate::class);
+
+        $event = new InventoryStockUpdate($v, 5);
+
+        $listener->handle($event);
+
+        $v->refresh();
+
+        $this->assertEquals($v->total_stock, 95);
     }
 
     private function createSupplier()

@@ -4,10 +4,12 @@ namespace Visanduma\LaravelInventory;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Visanduma\LaravelInventory\Commands\LaravelInventoryCommand;
+use Visanduma\LaravelInventory\Events\InventoryStockUpdate;
+use Visanduma\LaravelInventory\Listeners\StockUpdate;
 
 class LaravelInventoryServiceProvider extends PackageServiceProvider
 {
+
     public function configurePackage(Package $package): void
     {
         /*
@@ -19,5 +21,12 @@ class LaravelInventoryServiceProvider extends PackageServiceProvider
             ->name('laravel-inventory')
             ->hasConfigFile()
             ->hasMigration('create_laravel_inventory_tables');
+    }
+
+    public function boot()
+    {
+        parent::boot();
+
+        $this->app['events']->listen(InventoryStockUpdate::class,StockUpdate::class);
     }
 }
