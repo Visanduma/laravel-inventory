@@ -40,4 +40,12 @@ trait HasAttributes {
     {
         return $this->attributes()->where('name',$key)->first()->value ?? $default;
     }
+
+    public function scopeWhereHasAttribute($query,$name,$value)
+    {
+        return $query->attributes()->where([
+            'name' => $name,
+            'value' => $value
+        ]);
+    }
 }
