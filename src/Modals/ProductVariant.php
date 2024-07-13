@@ -156,4 +156,11 @@ class ProductVariant extends Model
     {
         return $this->stocks()->first()->price ?? 0;
     }
+
+    public function updateTotalStockValue(): void
+    {
+        $this->update([
+            'total_stock' => $this->totalInStock(),
+        ]);
+    }
 }

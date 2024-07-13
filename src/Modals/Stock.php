@@ -26,6 +26,19 @@ class Stock extends Model
     |
     */
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($model) {
+            $model->product->updateTotalStockValue();
+        });
+
+        static::created(function ($model) {
+            $model->product->updateTotalStockValue();
+        });
+    }
+
 
     public function product()
     {
