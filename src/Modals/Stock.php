@@ -6,6 +6,8 @@ namespace Visanduma\LaravelInventory\Modals;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Visanduma\LaravelInventory\Events\StockUpdated;
 use Visanduma\LaravelInventory\Exceptions\QuantityTypeException;
 use Visanduma\LaravelInventory\Traits\TableConfigs;
 use Visanduma\LaravelInventory\Modals\Supplier;
@@ -32,10 +34,12 @@ class Stock extends Model
 
         static::updated(function ($model) {
             $model->product->updateTotalStockValue();
+            Event::dispatch(new StockUpdated($model));
         });
 
         static::created(function ($model) {
             $model->product->updateTotalStockValue();
+            Event::dispatch(new StockUpdated($model));
         });
     }
 
