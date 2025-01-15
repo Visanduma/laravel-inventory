@@ -25,12 +25,12 @@ class Product extends Model
 
     public function category()
     {
-        return $this->belongsTo(ProductCategory::class, 'category_id');
+        return $this->belongsTo(config('inventory.models.product-category'), 'category_id');
     }
 
     public function metric()
     {
-        return $this->belongsTo(Metric::class, 'metric_id');
+        return $this->belongsTo(config('inventory.models.product-metric'), 'metric_id');
     }
 
     public function variants()
@@ -45,7 +45,7 @@ class Product extends Model
 
     public function options()
     {
-        return $this->hasMany(ProductOption::class,'product_id');
+        return $this->hasMany(config('inventory.models.product-option'), 'product_id');
     }
 
 
