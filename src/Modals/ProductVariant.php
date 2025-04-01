@@ -64,7 +64,7 @@ class ProductVariant extends Model
         return $this->sku->code ?? null;
     }
 
-    public function createStock($batch = 'default', Supplier $supplier): Stock
+    public function createStock(Supplier $supplier, $batch = 'default'): Stock
     {
         return $this->stocks()->create([
             'batch' => $batch,
