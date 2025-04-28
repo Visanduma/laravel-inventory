@@ -124,6 +124,18 @@ class Stock extends Model
         }
     }
 
+    /**
+     * Reduce stock quantity
+     *
+     * @param int $qty Quantity to reduce
+     * @param string|null $reason Reason for reduction
+     * @return mixed
+     */
+    public function reduce(int $qty, $reason = null)
+    {
+        return $this->take($qty, $reason);
+    }
+
     public function hasExpired(): bool
     {
         return $this->expire_at->isPast();

@@ -85,4 +85,30 @@ class StockTest extends TestCase
         $this->assertEquals(35, $v->totalInStock());
         $this->assertEquals(35, $v->total_stock);
     }
+
+    public function test_reduceStock()
+    {
+        $prd = $this->createProduct();
+        $v = $prd->createVariant();
+        $stock = $v->createStock('default', $this->createSupplier());
+
+        // Add initial stock
+        $stock->add(50);
+        $this->assertEquals(50, $v->stock()->qty);
+
+        // Test Stock::reduce() method
+        $stock->reduce(10, 'Testing stock reduce');
+        $v->refresh();
+        $this->assertEquals(40, $v->stock()->qty);
+
+        // Test ProductVariant::reduce() method
+        $v->reduce(15, 'Testing variant reduce');
+        $v->refresh();
+        $this->assertEquals(25, $v->stock()->qty);
+        $this->assertEquals(25, $v->totalInStock());
+        $this->assertEquals(25, $v->total_stock);
+
+        // Verify stock movement was created
+        $this->assertCount(3, $stock->movements);
+    }
 }
