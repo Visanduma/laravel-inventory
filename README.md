@@ -40,6 +40,45 @@ return [
 
 ## Usage
 
+### Stock Management
+
+#### Reducing Stock
+
+You can reduce stock in several ways:
+
+1. Using the Stock model directly:
+
+```php
+// Get a stock instance
+$stock = $productVariant->stock();
+
+// Reduce stock by 10 units
+$stock->reduce(10, 'Order #123');
+```
+
+2. Using the ProductVariant model:
+
+```php
+// Reduce stock by 5 units from the default batch
+$productVariant->reduce(5, 'Order #123');
+
+// Reduce stock from a specific batch
+$productVariant->reduce(5, 'Order #123', 'batch-name');
+```
+
+3. Using the LaravelInventory facade:
+
+```php
+use Visanduma\LaravelInventory\Facades\LaravelInventory;
+
+// Reduce stock for a product variant
+LaravelInventory::reduceStock($productVariant, 10, 'Order #123');
+
+// Reduce stock from a specific batch
+LaravelInventory::reduceStock($productVariant, 10, 'Order #123', 'batch-name');
+```
+
+Each method creates a stock movement record and updates the stock quantity.
 
 ## Testing
 

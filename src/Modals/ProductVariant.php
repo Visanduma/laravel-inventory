@@ -114,6 +114,19 @@ class ProductVariant extends Model
         return $this->stock($batch)->take($qty, $reason);
     }
 
+    /**
+     * Reduce stock quantity
+     *
+     * @param int $qty Quantity to reduce
+     * @param string|null $reason Reason for reduction
+     * @param string $batch Batch name
+     * @return mixed
+     */
+    public function reduce($qty, $reason = null, $batch = 'default')
+    {
+        return $this->stock($batch)->reduce($qty, $reason);
+    }
+
     public function totalInStock()
     {
         return $this->stocks()->sum('qty');
