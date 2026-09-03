@@ -3,9 +3,13 @@
 build
 composer.lock
 coverage
+temp_auto_push.bat
 docs
 phpunit.xml
 phpstan.neon
 testbench.yaml
 vendor
 node_modules
+.gitignore
+branch_structure.json
+temp_interactive_push.bat
